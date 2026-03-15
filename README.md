@@ -1,3 +1,44 @@
+# 💰 Finance SaaS Platform
+A full-stack financial management application built with Next.js and Hono.js, enabling users to track accounts, manage transactions, and analyze spending through an interactive dashboard with CSV import capabilities, developed as part of a comprehensive development tutorial.
+
+# 🚀 Key Features
+🔐 Secure Authentication: User sign-up, sign-in, and session management for personalized financial data.
+
+📊 Interactive Dashboard: Visual overview with summary cards (balance, income, expenses), interactive charts for income vs. expenses, and pie charts for category breakdowns.
+
+🏦 Account & Category Management: Full CRUD operations for managing financial accounts and transaction categories.
+
+📝 Transaction Tracking: Complete control over financial transactions with the ability to add, edit, delete, and view details.
+
+📤 Bulk CSV Import: Upload bank statements via CSV files with intelligent data mapping and preview before saving.
+
+🔍 Advanced Filtering: Filter dashboard data and transaction lists by date range and specific accounts.
+
+# 🛠 Tech Stack
+Framework: Next.js 14 (App Router)
+
+Frontend: React 18, TypeScript, Tailwind CSS, shadcn/ui
+
+API Layer: Hono.js for fast, type-safe edge APIs
+
+Database ORM: Drizzle ORM for type-safe database interactions
+
+Database: Neon (Serverless Postgres)
+
+Authentication: Appwrite
+
+Utilities: Recharts (charts), Papaparse (CSV parsing)
+
+# ⚙️ Setup & Installation
+Prerequisites
+Node.js (v18 or later)
+
+npm, yarn, or pnpm
+
+A Neon database project (or any Postgres database)
+
+An Appwrite project with credentials
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -14,7 +55,6 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

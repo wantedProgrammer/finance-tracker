@@ -54,16 +54,12 @@ export const Navigation = () => {
     if(isMobile) {
         return(
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
-                <SheetTrigger>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="font-normal bg-white/10 hover:bg-white/20 hover:text-white border-none
-                      focus-visible:ring-offset-0 focus-visible:ring-transparent outline-none text-white
-                      focus:bg-white/30 transition"
+                <SheetTrigger asChild>
+                    <div
+                      className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 font-normal bg-white/10 hover:bg-white/20 hover:text-white border-none focus-visible:ring-offset-0 focus-visible:ring-transparent outline-none text-white focus:bg-white/30 transition"
                     >
                         <Menu className="size-4"/>
-                    </Button>
+                    </div>
                 </SheetTrigger>
                 <SheetContent side="left" className="px-2">
                     <nav className="flex flex-col gap-y-2 pt-6">

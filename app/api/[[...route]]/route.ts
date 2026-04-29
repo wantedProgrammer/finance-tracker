@@ -4,6 +4,8 @@ import { handle } from 'hono/vercel'
 import { zValidator } from "@hono/zod-validator";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 
+import accounts from "./accounts";
+
 const app = new Hono().basePath('/api')
 
 app.get('/hello', 
@@ -21,5 +23,11 @@ app.get('/hello',
   })
 })
 
+const routes = app
+  .route("/accounts", accounts);
+   
+
 export const GET = handle(app)
 export const POST = handle(app)
+
+export type AppType = typeof app;

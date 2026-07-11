@@ -13,11 +13,6 @@ app.get('/hello',
   (c) => {
     const auth = getAuth(c);
 
-    if(!auth?.userId) {
-      return c.json({ error:
-        "Unauthorized"
-      });
-    }
   return c.json({
     message: 'Hello Next.js!',
   })

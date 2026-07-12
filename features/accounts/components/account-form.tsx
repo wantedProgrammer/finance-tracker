@@ -22,7 +22,7 @@ const formSchema = insertAccountSchema.pick({
 type FormValues = z.input<typeof formSchema>;
 
 type Props = {
-    id?: String;
+    id?: string;
     defaultValues?: FormValues;
     onSubmit: (values: FormValues) => void;
     onDelete?: () => void;
@@ -42,7 +42,7 @@ export const AccountForm = ({
     });
 
     const handleSubmit = (values: FormValues) => {
-        console.log({ values });
+        onSubmit(values);
     };
 
     const handleDelete = () => {
@@ -50,7 +50,7 @@ export const AccountForm = ({
     };
 
     return (
-        <Form {..form}>
+        <Form {...form}>
             <form
               onSubmit={form.handleSubmit(handleSubmit)}
               className="space-y-4 pt4"
@@ -58,7 +58,7 @@ export const AccountForm = ({
                 <FormField
                   name="name"
                   control={form.control}
-                  render={({ field (
+                  render={({ field }) => (
                     <FormItem>
                       <FormLabel>
                         Name
@@ -73,6 +73,19 @@ export const AccountForm = ({
                     </FormItem>
                   )}
                 />
+                <Button className="w-full" disabled={disabled}>
+                    {id ? "Save changes" : "Create account"}
+                </Button>
+                {!!id && <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleDelete}
+                  disabled={disabled}
+                  className="w-full"
+                >
+                    <Trash className="size-4 mr-2" />
+                    Delete account
+                </Button>}
             </form>
         </Form>
     

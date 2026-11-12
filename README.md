@@ -4,7 +4,6 @@
 
 A full-stack personal finance web app for tracking income and expenses across multiple accounts. Built with Next.js, Hono, Drizzle ORM and Neon PostgreSQL, with authentication handled by Clerk.
 
-This project started from [Code With Antonio's Finance SaaS tutorial](https://www.youtube.com/watch?v=N_uNKAus0II), which was recorded on Next.js 14. I'm building it on a newer version of the stack (Next.js App Router with `proxy.ts`, Tailwind CSS v4 and ESLint flat config), so a lot of the code has been adapted rather than copied directly.
 
 ---
 

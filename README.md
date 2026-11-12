@@ -1,88 +1,103 @@
-# 💰 Finance SaaS Platform
+# 💰 Finance Tracker
 
-A modern full-stack financial management application built with **Next.js 14**, **Hono.js**, **Drizzle ORM**, and **Neon PostgreSQL**. 
-Users can securely manage financial accounts, track transactions, visualize spending patterns, and import transaction data through an intuitive dashboard.
+> 🚧 **Work in progress.** Authentication and account management are working. Categories, transactions, CSV import and the analytics dashboard are being built next. See the [roadmap](#️-roadmap) for current status.
+
+A full-stack personal finance web app for tracking income and expenses across multiple accounts. Built with Next.js, Hono, Drizzle ORM and Neon PostgreSQL, with authentication handled by Clerk.
+
+This project started from [Code With Antonio's Finance SaaS tutorial](https://www.youtube.com/watch?v=N_uNKAus0II), which was recorded on Next.js 14. I'm building it on a newer version of the stack (Next.js App Router with `proxy.ts`, Tailwind CSS v4 and ESLint flat config), so a lot of the code has been adapted rather than copied directly.
 
 ---
 
-## ✨ Features
+## ✅ What works today
 
-- 🔐 Secure authentication with Clerk
-- 📊 Interactive financial dashboard
-- 💰 Track income and expenses
-- 🏦 Manage multiple financial accounts
-- 🗂️ Create and organize transaction categories
-- 📝 Full CRUD operations for transactions
-- 📈 Data visualization with interactive charts
-- 🥧 Spending breakdown by category
-- 📅 Filter transactions by date range
-- 🏛️ Filter data by account
-- 📤 Import transactions from CSV files
-- 👀 Preview imported data before saving
-- 📱 Fully responsive design
-- ⚡ Fast and type-safe API using Hono.js
+- 🔐 Sign up, sign in and protected routes with Clerk
+- 🏦 Create, view, edit and delete financial accounts
+- 🗑️ Bulk delete accounts from a data table
+- ⚡ Type-safe REST API built with Hono, running inside Next.js route handlers
+- 🗄️ PostgreSQL schema and migrations managed with Drizzle ORM, hosted on Neon
+
+---
+
+## 🗺️ Roadmap
+
+### Core features
+
+- [x] Authentication (Clerk)
+- [x] Hono API setup
+- [x] Database setup (Drizzle + Neon)
+- [x] Accounts: create, read, update, delete
+- [x] Accounts: data table with bulk delete
+- [ ] Categories: create, read, update, delete
+- [ ] Transactions API
+- [ ] Transactions form (income / expense toggle)
+- [ ] Transactions table with search and bulk delete
+- [ ] CSV import with preview before saving
+- [ ] Summary API
+- [ ] Dashboard summary cards
+- [ ] Dashboard charts (switchable chart types)
+- [ ] Spending breakdown by category
+- [ ] Date range and account filters
+- [ ] Deploy to Vercel
+
+### Planned extensions (my own additions)
+
+- [ ] Budget planning per category
+- [ ] Recurring transactions
+- [ ] Financial goals
+- [ ] Export reports as PDF
+- [ ] Multi-currency support
 
 ---
 
 ## 🛠️ Tech Stack
 
-### Frontend
-
-- Next.js 14 (App Router)
-- React 18
-- TypeScript
-- Tailwind CSS
-- shadcn/ui
-- React Hook Form
-- Zod
-
-### Backend
-
-- Hono.js
-- Drizzle ORM
-- Neon PostgreSQL
-
-### Authentication
-
-- Clerk
-
-### Data Visualization
-
-- Recharts
-
-### CSV Processing
-
-- PapaParse
-
-### Development Tools
-
-- ESLint
-- Prettier
-- Git
-- GitHub
+| Layer | Tools |
+| --- | --- |
+| Framework | Next.js (App Router), React, TypeScript |
+| Styling | Tailwind CSS v4, shadcn/ui |
+| Forms & validation | React Hook Form, Zod |
+| Data fetching | TanStack Query |
+| API | Hono |
+| Database | Neon PostgreSQL, Drizzle ORM |
+| Auth | Clerk |
+| Charts (planned) | Recharts |
+| CSV parsing (planned) | PapaParse |
 
 ---
 
 ## 🏗️ Architecture
 
 ```
-Client (Next.js + React)
+Client (Next.js + React + TanStack Query)
             │
             ▼
-      Hono.js API
+   Hono API (app/api/[[...route]])
             │
             ▼
-      Drizzle ORM
+       Drizzle ORM
             │
             ▼
      Neon PostgreSQL
 ```
 
+Each feature lives in its own folder under `features/`, containing its API hooks (queries and mutations) and UI components such as sheets and forms. The API routes are defined with Hono and share types with the client through Hono's RPC client, so request and response shapes are checked end to end.
+
 ---
 
-## 📸 Screenshots
+## 📂 Project Structure
 
-> Screenshots coming soon.
+```
+app/            Next.js routes, layouts and the Hono API entry point
+components/     Shared UI components (shadcn/ui and custom)
+db/             Drizzle schema and database client
+drizzle/        Generated SQL migrations
+features/       Feature modules (accounts, and later categories and transactions)
+lib/            Utilities and the typed Hono client
+providers/      React context providers (query client, sheets)
+public/         Static assets
+scripts/        Helper scripts (e.g. seeding)
+proxy.ts        Clerk route protection (formerly middleware.ts)
+```
 
 ---
 
@@ -90,76 +105,54 @@ Client (Next.js + React)
 
 ### Prerequisites
 
-- Node.js 18+
-- npm, pnpm, yarn, or bun
-- A Neon PostgreSQL database
-- A Clerk account
+- Node.js 18 or later
+- A [Neon](https://neon.tech/) PostgreSQL database
+- A [Clerk](https://clerk.com/) application
 
----
-
-### Clone the repository
+### 1. Clone and install
 
 ```bash
 git clone https://github.com/wantedProgrammer/finance-tracker.git
-
 cd finance-tracker
-```
-
----
-
-### Install dependencies
-
-```bash
 npm install
 ```
 
-or
+### 2. Set up environment variables
+
+Create a `.env.local` file in the project root:
+
+```env
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_SECRET_KEY=your_clerk_secret_key
+
+DATABASE_URL=your_neon_connection_string
+
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
+
+### 3. Run database migrations
 
 ```bash
-pnpm install
+npx drizzle-kit generate
+npx drizzle-kit migrate
 ```
+
+To browse the database in your browser:
+
+```bash
+npx drizzle-kit studio
+```
+
+### 4. Start the development server
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) and sign in to get started.
 
 ---
 
-## 📂 Project Structure
+## 📸 Screenshots
 
-```
-app/
-components/
-features/
-hooks/
-lib/
-db/
-drizzle/
-public/
-```
-
----
-
-## 🎯 Learning Objectives
-
-This project was completed to gain practical experience with:
-
-- Building full-stack applications using Next.js
-- Designing type-safe APIs with Hono.js
-- Managing relational databases using Drizzle ORM
-- Implementing secure authentication with Clerk
-- Working with PostgreSQL databases
-- Building reusable UI components
-- Data visualization using charts
-- Importing and validating CSV data
-- Modern TypeScript development
-
----
-
-## 🚀 Future Improvements
-
-- Budget planning
-- Recurring transactions
-- Financial goals
-- Email notifications
-- Mobile application
-- Multi-currency support
-- Receipt image uploads
-- AI-powered spending insights
-- Export reports as PDF
+Screenshots will be added once the dashboard is complete.

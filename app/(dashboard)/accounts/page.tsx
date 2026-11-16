@@ -64,6 +64,7 @@ if (accountQuery.isLoading) {
                 columns={columns} 
                 data={accounts} 
                 filterKey="name"
+                label="account"
                 onDelete={(row) => {
                     const ids = row.map((r) => r.original.id);
                     deleteAccounts.mutate({ ids });

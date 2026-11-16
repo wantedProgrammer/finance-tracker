@@ -36,6 +36,7 @@ interface DataTableProps<TData, TValue> {
   filterKey: string
   onDelete: (rows: Row<TData>[]) => void;
   disabled?: boolean;
+  label?: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -44,13 +45,8 @@ export function DataTable<TData, TValue>({
   filterKey,
   onDelete,
   disabled,
+  label = "item",
 }: DataTableProps<TData, TValue>) {
-  const [ConfirmDialog, confirm] = useConfirm(
-    "Are you sure?",
-    "You are about to perform a bulk delete? This action cannot be undone."
-  );
-
-
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
@@ -72,6 +68,15 @@ export function DataTable<TData, TValue>({
       rowSelection,
     },
   })
+
+  const selectedCount = table.getFilteredSelectedRowModel().rows.length
+
+  const [ConfirmDialog, confirm] = useConfirm(
+    "Are you sure?",
+    selectedCount > 1
+      ? "You are about to perform a bulk delete? This action cannot be undone."
+      : `You are about to delete this ${label}. This action cannot be undone.`
+  );
 
   return (
     <div>

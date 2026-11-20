@@ -29,7 +29,7 @@ export default function Page() {
         </ClerkLoading>
       </div>
       </div>
-      <div className="h-full bg-blue-600 hidden lg:flex items-center justify-center">
+      <div className="h-full bg-gradient-to-b from-blue-700 to-sky-500 hidden lg:flex items-center justify-center">
         <Image src="/logo.svg" height={400} width={400} alt="Logo" />
       </div>
     </div>

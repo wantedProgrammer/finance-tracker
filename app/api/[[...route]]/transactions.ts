@@ -22,7 +22,7 @@ import {
 
 import { createId } from "@paralleldrive/cuid2";
 import { z } from "zod";
-import { subDays, parse } from "date-fns";
+import { subDays, parse, endOfDay } from "date-fns";
 
 
 const app = new Hono()
@@ -42,7 +42,7 @@ const app = new Hono()
         return c.json({ error: "unauthourized" }, 401);
       }
 
-      const defaultTo = new Date();
+      const defaultTo = endOfDay(new Date());
       const defaultFrom = subDays(defaultTo, 30);
 
       const startDate = from 
@@ -50,7 +50,7 @@ const app = new Hono()
         : defaultFrom;
 
       const endDate = to 
-        ? parse(to, "yyyy-MM-dd", new Date())
+        ? endOfDay(parse(to, "yyyy-MM-dd", new Date()))
         : defaultTo;
 
     
@@ -264,7 +264,7 @@ const app = new Hono()
           .update(transactions)
           .set(values)
           .where(
-            inArray(transactions.id, sql`select id from ${transactionsToUpdate}`)
+            inArray(transactions.id, sql`(select id from ${transactionsToUpdate})`)
           )
           .returning();
 
@@ -312,7 +312,7 @@ const app = new Hono()
           .where(
             inArray(
               transactions.id,
-              sql`select id from ${transactionsToDelete}`
+              sql`(select id from ${transactionsToDelete})`
             ),
           )
           .returning({

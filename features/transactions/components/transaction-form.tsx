@@ -71,6 +71,7 @@ export const TransactionForm = ({
         onSubmit({
           ...values,
           amount: amountInMiliUnits,
+          categoryId: values.categoryId || null,
         });
 
     };

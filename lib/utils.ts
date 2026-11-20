@@ -1,4 +1,5 @@
 import { clsx, type ClassValue } from "clsx"
+import { Currency } from "lucide-react";
 import { twMerge } from "tailwind-merge"
 
 export function cn(...inputs: ClassValue[]) {
@@ -11,4 +12,13 @@ export function convertAmountFromMiliUnits(amount: number) {
 
 export function convertAmountToMiliUnits(amount: number) {
   return Math.round(amount * 1000);
+};
+
+export function formatCurrency(value: number) {
+  return Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "ZAR",
+    currencyDisplay: "narrowSymbol",
+    minimumFractionDigits: 2,
+  }).format(value);
 };

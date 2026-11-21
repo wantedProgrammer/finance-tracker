@@ -40,3 +40,9 @@ debug.log
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# real bank statements used for testing the PDF import (never commit these)
+statements/
+
+# pdf.js worker, copied from node_modules on install (scripts/copy-pdf-worker.mjs)
+public/pdf.worker.min.mjs

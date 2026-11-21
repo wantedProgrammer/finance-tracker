@@ -19,6 +19,8 @@ import { useBulkDeleteTransactions } from "@/features/transactions/api/use-bulk-
 import { transactions } from '../../../db/schema';
 import { UploadButton } from "./upload-button";
 import { ImportCard, type ImportedTransaction } from "./import-card";
+import { PdfUploadButton, type ParsedStatement } from "./pdf-upload-button";
+import { PdfImportCard } from "./pdf-import-card";
 import { useSelectAccount } from "@/features/accounts/hooks/use-select-account";
 import { useBulkCreateTransactions } from "@/features/transactions/api/use-bulk-create-transactions";
 import { toast } from "sonner";
@@ -28,7 +30,8 @@ import { useCategorizeTransactions } from "@/features/transactions/api/use-categ
 
 enum VARIANTS {
     LIST="LIST",
-    IMPORT="IMPORT"
+    IMPORT="IMPORT",
+    IMPORT_PDF="IMPORT_PDF"
 };
 
 const INTIAL_IMPORT_RESULTS = {
@@ -44,13 +47,20 @@ const TransactionsPage = () => {
 
 
     const onUpload = (results: typeof INTIAL_IMPORT_RESULTS) => {
-        console.log({ results });
         setImportResults(results);
         setVariant(VARIANTS.IMPORT);
     }
 
+    const [pdfStatement, setPdfStatement] = useState<ParsedStatement | null>(null);
+
+    const onPdfParsed = (statement: ParsedStatement) => {
+        setPdfStatement(statement);
+        setVariant(VARIANTS.IMPORT_PDF);
+    }
+
     const onCancelImport = () => {
         setImportResults(INTIAL_IMPORT_RESULTS);
+        setPdfStatement(null);
         setVariant(VARIANTS.LIST);
     }
 
@@ -110,6 +120,20 @@ if (transactionsQuery.isLoading) {
     );
 }
 
+  if (variant == VARIANTS.IMPORT_PDF && pdfStatement) {
+    return (
+        <>
+            <AccountDialog />
+            <PdfImportCard
+                statement={pdfStatement}
+                onCancel={onCancelImport}
+                onSubmit={onSubmitImport}
+                disabled={createTransactions.isPending}
+            />
+        </>
+    );
+  }
+
   if(variant == VARIANTS.IMPORT) {
     return (
         <>  
@@ -148,6 +172,7 @@ if (transactionsQuery.isLoading) {
                         Add New
                     </Button>
                     <UploadButton onUpload={onUpload} />
+                    <PdfUploadButton onParsed={onPdfParsed} />
                 </div>
             </CardHeader>
             <CardContent>

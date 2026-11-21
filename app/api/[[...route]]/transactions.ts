@@ -5,8 +5,9 @@ import {
   gte,
   lte,
   desc,
-  sql, 
-  inArray 
+  sql,
+  inArray,
+  isNull,
 } from "drizzle-orm";
 
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
@@ -244,19 +245,90 @@ const app = new Hono()
           return c.json({ error: "Not found" }, 404);
         }
 
-        const categorizedValues = await autoCategorize(auth.userId, values);
+        // Rows with an externalId (PDF statements) that are already in their account are
+        // skipped before categorizing, so re-importing never recreates deleted categories.
+        // Rows without one (manual entry, CSV) are always inserted, as before.
+        const externalIds = values.flatMap((value) => value.externalId ? [value.externalId] : []);
+        const existing = externalIds.length
+          ? await db
+              .select({ accountId: transactions.accountId, externalId: transactions.externalId })
+              .from(transactions)
+              .where(and(
+                inArray(transactions.externalId, externalIds),
+                inArray(transactions.accountId, [...new Set(values.map((value) => value.accountId))]),
+              ))
+          : [];
+        const existingKeys = new Set(existing.map((row) => `${row.accountId}|${row.externalId}`));
+        let newValues = values.filter(
+          (value) => !value.externalId || !existingKeys.has(`${value.accountId}|${value.externalId}`),
+        );
 
-        const data = await db
-          .insert(transactions)
-          .values(
-            categorizedValues.map((value) => ({
-              id: createId(),
-              ...value,
-            }))
-          )
-          .returning();
+        // Statement rows also skip transactions already entered another way (CSV import or by
+        // hand), matched on date, amount and payee. Only rows without an externalId are
+        // compared, so an earlier PDF import is never mistaken for a different identical one.
+        // Matches are counted: two identical purchases on one day only cancel two existing ones.
+        const statementRows = newValues.filter((value) => value.externalId);
 
-        return c.json({ data });
+        if (statementRows.length) {
+          const matchKey = (row: { accountId: string; date: Date; amount: number; payee: string }) =>
+            `${row.accountId}|${row.date.getTime()}|${row.amount}|${row.payee.trim().toUpperCase()}`;
+
+          const times = statementRows.map((value) => value.date.getTime());
+          const candidates = await db
+            .select({
+              accountId: transactions.accountId,
+              date: transactions.date,
+              amount: transactions.amount,
+              payee: transactions.payee,
+            })
+            .from(transactions)
+            .where(and(
+              inArray(transactions.accountId, [...new Set(statementRows.map((value) => value.accountId))]),
+              isNull(transactions.externalId),
+              gte(transactions.date, new Date(Math.min(...times))),
+              lte(transactions.date, new Date(Math.max(...times))),
+            ));
+
+          const available = new Map<string, number>();
+          for (const candidate of candidates) {
+            const key = matchKey(candidate);
+            available.set(key, (available.get(key) ?? 0) + 1);
+          }
+
+          newValues = newValues.filter((value) => {
+            if (!value.externalId) return true;
+
+            const key = matchKey(value);
+            const count = available.get(key) ?? 0;
+            if (count === 0) return true;
+
+            available.set(key, count - 1);
+            return false;
+          });
+        }
+
+        const categorizedValues = await autoCategorize(auth.userId, newValues);
+
+        // onConflictDoNothing also covers duplicates within this upload and races with
+        // another import. NULL externalIds never conflict.
+        const data = categorizedValues.length
+          ? await db
+              .insert(transactions)
+              .values(
+                categorizedValues.map((value) => ({
+                  id: createId(),
+                  ...value,
+                }))
+              )
+              .onConflictDoNothing({ target: [transactions.accountId, transactions.externalId] })
+              .returning()
+          : [];
+
+        return c.json({
+          data,
+          imported: data.length,
+          skipped: values.length - data.length,
+        });
       }
     )
     .post(

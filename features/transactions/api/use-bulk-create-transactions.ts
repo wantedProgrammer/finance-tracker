@@ -20,8 +20,22 @@ export const useBulkCreateTransactions = () => {
                 json });
             return await response.json();
         },
-        onSuccess: (_data, transactions) => {
-            toast.success(transactions.length === 1 ? "Transaction created" : "Transactions created");
+        onSuccess: (data, transactions) => {
+            const skipped = "skipped" in data ? data.skipped : 0;
+            const imported = "imported" in data ? data.imported : transactions.length;
+
+            if (skipped === 0) {
+                toast.success(transactions.length === 1 ? "Transaction created" : "Transactions created");
+            } else if (imported === 0) {
+                // Re-importing a statement: everything was already there.
+                toast.success(`Nothing new: all ${skipped} transactions already existed`);
+            } else {
+                toast.success(
+                    `Imported ${imported} ${imported === 1 ? "transaction" : "transactions"}, ` +
+                    `${skipped} already existed`
+                );
+            }
+
             queryClient.invalidateQueries({ queryKey: ["transactions"] });
             // Auto-categorize may have created new categories.
             queryClient.invalidateQueries({ queryKey: ["categories"] });

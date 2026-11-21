@@ -34,6 +34,8 @@ export type ImportedTransaction = {
     payee: string;
     amount: number;
     notes: string | null;
+    // Set for PDF statement rows so re-importing the same statement skips duplicates.
+    externalId?: string;
 };
 
 type Props = {

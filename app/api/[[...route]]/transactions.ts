@@ -25,6 +25,38 @@ import { z } from "zod";
 import { subDays, parse, endOfDay } from "date-fns";
 
 
+// Checks every account and category a transaction points at belongs to the user,
+// so nobody can write transactions into someone else's account.
+const ownsReferences = async (
+  userId: string,
+  values: { accountId: string; categoryId?: string | null }[],
+) => {
+  const accountIds = [...new Set(values.map((value) => value.accountId))];
+  const categoryIds = [
+    ...new Set(values.map((value) => value.categoryId).filter((id): id is string => !!id)),
+  ];
+
+  if (accountIds.length) {
+    const ownedAccounts = await db
+      .select({ id: accounts.id })
+      .from(accounts)
+      .where(and(eq(accounts.userId, userId), inArray(accounts.id, accountIds)));
+
+    if (ownedAccounts.length !== accountIds.length) return false;
+  }
+
+  if (categoryIds.length) {
+    const ownedCategories = await db
+      .select({ id: categories.id })
+      .from(categories)
+      .where(and(eq(categories.userId, userId), inArray(categories.id, categoryIds)));
+
+    if (ownedCategories.length !== categoryIds.length) return false;
+  }
+
+  return true;
+};
+
 const app = new Hono()
    .get("/",
     zValidator("query", z.object({
@@ -139,6 +171,10 @@ const app = new Hono()
           return c.json({ error: "Unauthorized" }, 401);
         }
 
+        if (!(await ownsReferences(auth.userId, [values]))) {
+          return c.json({ error: "Not found" }, 404);
+        }
+
         const [data] = await db.insert
         (transactions).values({
           id: createId(),
@@ -164,6 +200,10 @@ const app = new Hono()
 
         if (!auth?.userId) {
           return c.json({ error: "Unauthorized" }, 401);
+        }
+
+        if (!(await ownsReferences(auth.userId, values))) {
+          return c.json({ error: "Not found" }, 404);
         }
 
         const data = await db
@@ -247,6 +287,10 @@ const app = new Hono()
 
         if (!auth?.userId) {
           return c.json({ error: "Unauthorized" }, 401);
+        }
+
+        if (!(await ownsReferences(auth.userId, [values]))) {
+          return c.json({ error: "Not found" }, 404);
         }
 
         const transactionsToUpdate = db.$with("transactions_to_update").as(

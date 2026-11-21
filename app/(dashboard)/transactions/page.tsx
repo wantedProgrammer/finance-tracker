@@ -12,14 +12,77 @@ import { Loader2, Plus } from "lucide-react";
 import { useNewTransaction } from "@/features/transactions/hooks/use-new-transaction";
 import { useGetTransactions } from "@/features/transactions/api/use-get-transactions";
 
+import { useState } from "react";
 import { columns } from "./columns"
 import { DataTable } from "@/components/data-table"
 import { useBulkDeleteTransactions } from "@/features/transactions/api/use-bulk-delete-transactions";
 import { transactions } from '../../../db/schema';
+import { UploadButton } from "./upload-button";
+import { ImportCard, type ImportedTransaction } from "./import-card";
+import { useSelectAccount } from "@/features/accounts/hooks/use-select-account";
+import { useBulkCreateTransactions } from "@/features/transactions/api/use-bulk-create-transactions";
+import { toast } from "sonner";
+import { format } from "date-fns";
+import { useRouter } from "next/navigation";
+import { DateFilter } from "@/components/date-filter";
 
+enum VARIANTS {
+    LIST="LIST",
+    IMPORT="IMPORT"
+};
 
+const INTIAL_IMPORT_RESULTS = {
+    data: [],
+    errors: [],
+    meta: {},
+};
 
 const TransactionsPage = () => {
+    const [variant, setVariant] = useState<VARIANTS>(VARIANTS.LIST);
+    const [importResults, setImportResults] = useState
+    (INTIAL_IMPORT_RESULTS); 
+
+
+    const onUpload = (results: typeof INTIAL_IMPORT_RESULTS) => {
+        console.log({ results });
+        setImportResults(results);
+        setVariant(VARIANTS.IMPORT);
+    }
+
+    const onCancelImport = () => {
+        setImportResults(INTIAL_IMPORT_RESULTS);
+        setVariant(VARIANTS.LIST);
+    }
+
+    const router = useRouter();
+    const [AccountDialog, confirmAccount] = useSelectAccount();
+    const createTransactions = useBulkCreateTransactions();
+
+    const onSubmitImport = async (values: ImportedTransaction[]) => {
+        const accountId = await confirmAccount();
+
+        if (!accountId) {
+            return toast.error("Please select an account to continue.");
+        }
+
+        const data = values.map((value) => ({
+            ...value,
+            accountId,
+        }));
+
+        createTransactions.mutate(data, {
+            onSuccess: () => {
+                onCancelImport();
+
+                // Jump the date filter to the imported range so the new rows are visible.
+                const times = values.map((value) => value.date.getTime());
+                const from = format(new Date(Math.min(...times)), "yyyy-MM-dd");
+                const to = format(new Date(Math.max(...times)), "yyyy-MM-dd");
+                router.push(`/transactions?from=${from}&to=${to}`);
+            },
+        });
+    };
+
     const newTransaction = useNewTransaction();
     const deleteTransactions = useBulkDeleteTransactions();
     const transactionsQuery = useGetTransactions();
@@ -46,6 +109,20 @@ if (transactionsQuery.isLoading) {
     );
 }
 
+  if(variant == VARIANTS.IMPORT) {
+    return (
+        <>  
+            <AccountDialog />
+            <ImportCard
+                data={importResults.data}
+                onCancel={onCancelImport}
+                onSubmit={onSubmitImport}
+                disabled={createTransactions.isPending}
+            />
+        </>
+    );
+  }
+
 
 
   return (
@@ -55,10 +132,14 @@ if (transactionsQuery.isLoading) {
                 <CardTitle className="text-xl line-clamp-1 min-w-0">
                     Transaction History
                 </CardTitle>
-                <Button onClick={newTransaction.onOpen} size="sm" className="shrink-0"> 
-                    <Plus className="size-4" />  
-                    Add New
-                </Button>
+                <div className="flex flex-wrap items-center justify-end gap-2">
+                    <DateFilter />
+                    <Button onClick={newTransaction.onOpen} size="sm">
+                        <Plus className="size-4" />
+                        Add New
+                    </Button>
+                    <UploadButton onUpload={onUpload} />
+                </div>
             </CardHeader>
             <CardContent>
                 <DataTable 

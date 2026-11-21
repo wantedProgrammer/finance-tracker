@@ -6,6 +6,8 @@ import { ChevronDown } from "lucide-react";
 import type { DateRange } from "react-day-picker";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
+import { formatDateRange } from "@/lib/utils";
+import { useGetSummary } from "@/features/summary/api/use-get-summary";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {
@@ -23,17 +25,11 @@ const getDefaultRange = (): DateRange => {
     return { from: subDays(to, 30), to };
 };
 
-const formatRange = (range?: DateRange) => {
-    const { from, to } = range?.from ? range : getDefaultRange();
-    if (!from) return "";
-    if (!to) return format(from, "dd MMM yyyy");
-    return `${format(from, "dd MMM yyyy")} - ${format(to, "dd MMM yyyy")}`;
-};
-
 export const DateFilter = () => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { isLoading: isLoadingSummary } = useGetSummary();
 
     const fromParam = searchParams.get("from");
     const toParam = searchParams.get("to");
@@ -73,9 +69,10 @@ export const DateFilter = () => {
                 <Button
                   size="sm"
                   variant="outline"
+                  disabled={isLoadingSummary}
                   className="w-full lg:w-auto font-normal bg-white/10 hover:bg-white/20 hover:text-white border-none focus-visible:ring-offset-0 focus-visible:ring-transparent outline-none text-white focus:bg-white/30 transition"
                 >
-                    <span>{formatRange(currentRange)}</span>
+                    <span>{formatDateRange({ from: fromParam ?? undefined, to: toParam ?? undefined })}</span>
                     <ChevronDown className="size-4 opacity-50" />
                 </Button>
             </PopoverTrigger>

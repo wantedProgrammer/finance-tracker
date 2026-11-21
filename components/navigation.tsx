@@ -40,7 +40,7 @@ const routes = [
 ]
 
 // Params that should follow you between pages, so the selected period stays the same.
-const SHARED_PARAMS = ["from", "to"];
+const SHARED_PARAMS = ["from", "to", "accountId"];
 
 export const Navigation = () => {
     return (

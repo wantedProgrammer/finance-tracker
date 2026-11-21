@@ -21,6 +21,7 @@ import {
  } from "@/db/schema";
 
 import { createId } from "@paralleldrive/cuid2";
+import { autoCategorize, categorizeExisting, learnCategory } from "@/lib/auto-categorize";
 import { z } from "zod";
 import { subDays, parse, endOfDay } from "date-fns";
 
@@ -175,11 +176,18 @@ const app = new Hono()
           return c.json({ error: "Not found" }, 404);
         }
 
+        // No category picked: try the rules. Category picked: learn it for this payee.
+        const [value] = await autoCategorize(auth.userId, [values]);
+
         const [data] = await db.insert
         (transactions).values({
           id: createId(),
-          ...values,
+          ...value,
         }).returning();
+
+        if (values.categoryId) {
+          await learnCategory(auth.userId, values.payee, values.categoryId);
+        }
 
         return c.json({ data });
       })
@@ -206,15 +214,32 @@ const app = new Hono()
           return c.json({ error: "Not found" }, 404);
         }
 
+        const categorizedValues = await autoCategorize(auth.userId, values);
+
         const data = await db
           .insert(transactions)
           .values(
-            values.map((value) => ({
+            categorizedValues.map((value) => ({
               id: createId(),
               ...value,
             }))
           )
           .returning();
+
+        return c.json({ data });
+      }
+    )
+    .post(
+      "/categorize",
+      clerkMiddleware(),
+      async (c) => {
+        const auth = getAuth(c);
+
+        if (!auth?.userId) {
+          return c.json({ error: "Unauthorized" }, 401);
+        }
+
+        const data = await categorizeExisting(auth.userId);
 
         return c.json({ data });
       }
@@ -314,6 +339,10 @@ const app = new Hono()
 
         if (!data) {
           return c.json({ error: "Not found" }, 404);
+        }
+
+        if (values.categoryId) {
+          await learnCategory(auth.userId, data.payee, values.categoryId);
         }
 
         return c.json({ data });

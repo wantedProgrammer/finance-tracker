@@ -85,7 +85,7 @@ export const DateFilter = () => {
                   defaultMonth={date?.from}
                   selected={date}
                   onSelect={setDate}
-                  numberOfMonths={2}
+                  resetOnSelect
                   autoFocus
                 />
                 <div className="flex items-center gap-x-2 p-4 pt-0">

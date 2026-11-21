@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Wand2 } from "lucide-react";
 import { useNewTransaction } from "@/features/transactions/hooks/use-new-transaction";
 import { useGetTransactions } from "@/features/transactions/api/use-get-transactions";
 
@@ -25,6 +25,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { DateFilter } from "@/components/date-filter";
+import { useCategorizeTransactions } from "@/features/transactions/api/use-categorize-transactions";
 
 enum VARIANTS {
     LIST="LIST",
@@ -85,6 +86,7 @@ const TransactionsPage = () => {
 
     const newTransaction = useNewTransaction();
     const deleteTransactions = useBulkDeleteTransactions();
+    const categorizeTransactions = useCategorizeTransactions();
     const transactionsQuery = useGetTransactions();
     const transactions = transactionsQuery.data || [];
 
@@ -134,6 +136,15 @@ if (transactionsQuery.isLoading) {
                 </CardTitle>
                 <div className="flex flex-wrap items-center justify-end gap-2">
                     <DateFilter />
+                    <Button
+                      onClick={() => categorizeTransactions.mutate()}
+                      disabled={categorizeTransactions.isPending}
+                      size="sm"
+                      variant="outline"
+                    >
+                        <Wand2 className="size-4" />
+                        Categorize
+                    </Button>
                     <Button onClick={newTransaction.onOpen} size="sm">
                         <Plus className="size-4" />
                         Add New

@@ -23,7 +23,9 @@ export const useBulkCreateTransactions = () => {
         onSuccess: (_data, transactions) => {
             toast.success(transactions.length === 1 ? "Transaction created" : "Transactions created");
             queryClient.invalidateQueries({ queryKey: ["transactions"] });
-            // TODO: Also invalidate summary
+            // Auto-categorize may have created new categories.
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
+            queryClient.invalidateQueries({ queryKey: ["summary"] });
         },
         onError: () => {
             toast.error("Failed to create transactions");

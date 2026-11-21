@@ -7,6 +7,7 @@ import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import accounts from "./accounts";
 import categories from "./categories";
 import transactions from './transactions';
+import summary from "./summary";
 
 const app = new Hono().basePath('/api')
 
@@ -23,7 +24,8 @@ app.get('/hello',
 const routes = app
   .route("/accounts", accounts)
   .route("/categories", categories)
-  .route("/transactions", transactions);
+  .route("/transactions", transactions)
+  .route("/summary", summary);
    
 
 export const GET = handle(app)

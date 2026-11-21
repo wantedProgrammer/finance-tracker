@@ -55,6 +55,17 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
     }),
 }));
 
+// Payee patterns the user has taught the app ("FOOD ZONE" -> Groceries).
+// Learned automatically whenever a transaction is given a category.
+export const categoryRules = pgTable("category_rules", {
+    id: text("id").primaryKey(),
+    userId: text("user_id").notNull(),
+    pattern: text("pattern").notNull(),
+    categoryId: text("category_id").references(() => categories.id, {
+        onDelete: "cascade",
+    }).notNull(),
+});
+
 export const insertTransactionSchema = createInsertSchema(transactions, {
     date: z.coerce.date()
 });

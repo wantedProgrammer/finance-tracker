@@ -52,6 +52,7 @@ const transactionSchema = z.object({
     type: z.enum(["DEBIT", "CREDIT"]),
     status: z.string(),
     description: z.string(),
+    transactionType: z.string().nullish(),
     postedOrder: z.number().nullish(),
     postingDate: z.string().nullish(),
     transactionDate: z.string().nullish(),

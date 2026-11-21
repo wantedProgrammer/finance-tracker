@@ -15,29 +15,60 @@ type DefaultRule = {
 export const DEFAULT_RULES: DefaultRule[] = [
     {
         category: "Bank Fees",
-        patterns: [/\bFEE\b/, "MONTHLY MANAGEMENT", "EXCESS INTEREST"],
+        patterns: [
+            /\bFEE\b/, "MONTHLY MANAGEMENT", "EXCESS INTEREST",
+            "SERVICE CHARGE", "DEBIT INTEREST",
+        ],
         expenseOnly: true,
     },
     {
         category: "Income",
-        patterns: ["PAYMENT FROM", "TRANSFER FROM", "TELETRANSMISSION INWARD", "DEPOSIT", "SALARY"],
+        patterns: [
+            "PAYMENT FROM", "TRANSFER FROM", "TELETRANSMISSION INWARD", "DEPOSIT", "SALARY",
+            "CREDIT INTEREST",
+        ],
         incomeOnly: true,
     },
     {
         category: "Cash",
-        patterns: ["CASH WITHDRAWAL", "INSTANT MONEY", "INSTANTMON", "DEBIT CARD CASH"],
+        patterns: ["CASH WITHDRAWAL", "INSTANT MONEY", "INSTANTMON", "DEBIT CARD CASH", "ATM WITHDRAWAL"],
         expenseOnly: true,
     },
     {
         category: "Food & Groceries",
         patterns: [
             "FOOD ZONE", "FOODZONE", "CHECKERS", "PNP", "PICK N PAY", "SHOPRITE",
-            /\bSPAR\b/, "WOOLWORTHS", "KFC", "MCD", "STEERS", "MR D FOOD", "NANDO",
+            /\bSPAR\b/, "SUPERSPAR", "KWIKSPAR", "WOOLWORTHS", "OK EXPRESS", "OK FOODS", "OK MINIMARK",
+            "KFC", "MCD", "STEERS", "MR D FOOD", "NANDO",
         ],
     },
     {
         category: "Transport",
-        patterns: ["INDRIVE", "BOLT", "UBER"],
+        patterns: [
+            "INDRIVE", "BOLT", "UBER",
+            // Fuel stations.
+            "SASOL", "ENGEN", "CALTEX", "ASTRON", /\bSHELL\b/, /\bBP\b/, /\bTOTAL\b/,
+        ],
+    },
+    {
+        category: "Housing",
+        // Whole words where a substring would misfire ("RENT" is inside "CURRENT").
+        patterns: [/\bH ?LOAN\b/, "HOME LOAN", /\bBOND\b/, /\bNEDBHL\b/, /\bLEVY\b/, /\bHOA\b/, /\bRENT\b/],
+        expenseOnly: true,
+    },
+    {
+        category: "Utilities",
+        patterns: ["CITY OF", "MUNICIPALITY", "ESKOM", "ELECTRICITY", "PREPAID ELEC"],
+        expenseOnly: true,
+    },
+    {
+        category: "Insurance",
+        patterns: ["MOMENTUM", "OLD MUTUAL", "SANLAM", "OUTSURANCE", "DISCOVERY LIFE", "LIBERTY", "HOLLARD"],
+        expenseOnly: true,
+    },
+    {
+        category: "Shopping",
+        patterns: ["TAKEALOT", "TAKEALO*T", "AMAZON", "MAKRO", "GAME STORES", "CAROUSEL"],
     },
     {
         category: "Airtime & Data",
@@ -53,7 +84,11 @@ export const DEFAULT_RULES: DefaultRule[] = [
     },
     {
         category: "Health",
-        patterns: ["DISCHEM", "DIS-CHEM", "CLICKS"],
+        patterns: [
+            "DISCHEM", "DIS-CHEM", "CLICKS", "PHARM", /\bPHA\b/,
+            // Medical aid and doctors.
+            "MOMMED", "DISCOVERY HEALTH", "BONITAS", "MEDSHIELD", /\bDRS\b/, "DOCTOR",
+        ],
     },
     {
         category: "Personal Care",

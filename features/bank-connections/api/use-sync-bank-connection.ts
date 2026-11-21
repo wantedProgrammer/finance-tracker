@@ -41,6 +41,8 @@ export const useSyncBankConnection = () => {
             queryClient.invalidateQueries({ queryKey: ["bank-connection"] });
             queryClient.invalidateQueries({ queryKey: ["transactions"] });
             queryClient.invalidateQueries({ queryKey: ["summary"] });
+            // Auto-categorize may have created new categories.
+            queryClient.invalidateQueries({ queryKey: ["categories"] });
         },
         onError: () => {
             toast.error("Failed to sync transactions");

@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { createHash } from "crypto";
-import { and, eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
 import { createId } from "@paralleldrive/cuid2";
@@ -10,6 +10,7 @@ import { format, parse, subDays } from "date-fns";
 import { db } from "@/db/drizzle";
 import { accounts, bankConnections, transactions } from "@/db/schema";
 import { convertAmountToMiliUnits } from "@/lib/utils";
+import { autoCategorize } from "@/lib/auto-categorize";
 import {
   InvestecError,
   isInvestecSandbox,
@@ -24,7 +25,28 @@ const PROVIDER = "investec";
 const SYNC_OVERLAP_DAYS = 7;
 const FIRST_SYNC_DAYS = 90;
 
-const maskAccountNumber = (accountNumber: string) => `•••• ${accountNumber.slice(-4)}`;
+// Investec's transactionType as a readable note ("ATMWithdrawals" -> "ATM withdrawal"),
+// like the second line a CSV import keeps. It also helps auto-categorize.
+const TRANSACTION_TYPE_LABELS: Record<string, string> = {
+  CardPurchases: "Card purchase",
+  ATMWithdrawals: "ATM withdrawal",
+  Deposits: "Deposit",
+  OnlineBankingPayments: "Online payment",
+  DebitOrders: "Debit order",
+  FeesAndInterest: "Fees and interest",
+  VASTransactions: "Prepaid purchase",
+  FasterPay: "Faster payment",
+};
+
+const describeTransactionType = (transactionType?: string | null) => {
+  if (!transactionType) return null;
+
+  return TRANSACTION_TYPE_LABELS[transactionType]
+    // Unknown types: split "SomeNewType" into "Some new type".
+    ?? transactionType.replace(/([a-z])([A-Z])/g, "$1 $2").toLowerCase().replace(/^\w/, (c) => c.toUpperCase());
+};
+
+const maskAccountNumber =(accountNumber: string) => `•••• ${accountNumber.slice(-4)}`;
 
 // Investec's uuid is stable for posted transactions. If one is ever missing, fall back to a
 // hash of the transaction's details. postedOrder keeps two identical same-day purchases apart.
@@ -238,17 +260,36 @@ const app = new Hono()
           amount: transaction.type === "DEBIT" ? -miliunits : miliunits,
           date: parse(day, "yyyy-MM-dd", new Date()),
           payee: transaction.description,
+          notes: describeTransactionType(transaction.transactionType),
           externalId: getExternalId(transaction),
-          categoryId: null,
+          categoryId: null as string | null,
         };
       });
 
+      // Skip ones already imported before categorizing, so a re-sync never recreates
+      // categories the user has deleted.
+      const existing = values.length
+        ? await db
+            .select({ externalId: transactions.externalId })
+            .from(transactions)
+            .where(and(
+              eq(transactions.accountId, connection.accountId),
+              inArray(transactions.externalId, values.map((value) => value.externalId)),
+            ))
+        : [];
+      const existingIds = new Set(existing.map((row) => row.externalId));
+      const newValues = values.filter((value) => !existingIds.has(value.externalId));
+
+      // Same rules as CSV imports: the user's learned payee rules first, then the built-in ones.
+      // Missing categories are created for the user.
+      const categorizedValues = await autoCategorize(auth.userId, newValues);
+
       // The unique index on (accountId, externalId) makes re-syncing safe: rows that are
       // already there are skipped, never duplicated.
-      const inserted = values.length
+      const inserted = categorizedValues.length
         ? await db
             .insert(transactions)
-            .values(values)
+            .values(categorizedValues)
             .onConflictDoNothing({ target: [transactions.accountId, transactions.externalId] })
             .returning({ id: transactions.id })
         : [];

@@ -114,9 +114,39 @@ const app = new Hono()
 
      return c.json({ data });
     })
+    // Must stay above "/:id", otherwise "export" is treated as a transaction id.
+    .get(
+      "/export",
+      clerkMiddleware(),
+      async (c) => {
+        const auth = getAuth(c);
+
+        if (!auth?.userId) {
+          return c.json({ error: "Unauthorized" }, 401);
+        }
+
+        // Every transaction the user has, ignoring the date and account filters.
+        const data = await db
+          .select({
+            date: transactions.date,
+            payee: transactions.payee,
+            amount: transactions.amount,
+            notes: transactions.notes,
+            account: accounts.name,
+            category: categories.name,
+          })
+          .from(transactions)
+          .innerJoin(accounts, eq(transactions.accountId, accounts.id))
+          .leftJoin(categories, eq(transactions.categoryId, categories.id))
+          .where(eq(accounts.userId, auth.userId))
+          .orderBy(desc(transactions.date));
+
+        return c.json({ data });
+      },
+    )
     .get(
       "/:id",
-      zValidator("param", z.object({ 
+      zValidator("param", z.object({
         id: z.string().optional()
       })),
       clerkMiddleware(),

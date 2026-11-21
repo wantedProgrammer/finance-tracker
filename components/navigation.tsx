@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import{ useMedia } from "react-use";
 
 import { Menu } from "lucide-react";
 
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import{
     Sheet,
@@ -39,7 +39,32 @@ const routes = [
     }
 ]
 
+// Params that should follow you between pages, so the selected period stays the same.
+const SHARED_PARAMS = ["from", "to"];
+
 export const Navigation = () => {
+    return (
+        <Suspense fallback={<NavigationLinks query="" />}>
+            <NavigationWithParams />
+        </Suspense>
+    );
+};
+
+const NavigationWithParams = () => {
+    const searchParams = useSearchParams();
+
+    const params = new URLSearchParams();
+    SHARED_PARAMS.forEach((key) => {
+        const value = searchParams.get(key);
+        if (value) params.set(key, value);
+    });
+
+    const query = params.toString();
+
+    return <NavigationLinks query={query ? `?${query}` : ""} />;
+};
+
+const NavigationLinks = ({ query }: { query: string }) => {
     const [isOpen, setIsOpen] = useState(false);
 
     const router = useRouter();
@@ -67,7 +92,7 @@ export const Navigation = () => {
                             <Button
                               key={route.href}
                               variant={route.href == pathname ? "secondary" : "ghost"}
-                              onClick={() => onClick(route.href)}
+                              onClick={() => onClick(`${route.href}${query}`)}
                               className="w-full justify-start"
                             >
                                 {route.label}
@@ -84,7 +109,7 @@ export const Navigation = () => {
             {routes.map((route) => (
                 <NavButton
                   key={route.href}
-                  href={route.href}
+                  href={`${route.href}${query}`}
                   label={route.label}
                   isActive={pathname === route.href}
                 />

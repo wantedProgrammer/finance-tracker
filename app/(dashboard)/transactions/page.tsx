@@ -24,7 +24,6 @@ import { useBulkCreateTransactions } from "@/features/transactions/api/use-bulk-
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
-import { DateFilter } from "@/components/date-filter";
 import { useCategorizeTransactions } from "@/features/transactions/api/use-categorize-transactions";
 
 enum VARIANTS {
@@ -135,7 +134,6 @@ if (transactionsQuery.isLoading) {
                     Transaction History
                 </CardTitle>
                 <div className="flex flex-wrap items-center justify-end gap-2">
-                    <DateFilter />
                     <Button
                       onClick={() => categorizeTransactions.mutate()}
                       disabled={categorizeTransactions.isPending}

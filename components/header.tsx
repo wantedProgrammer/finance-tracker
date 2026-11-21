@@ -1,6 +1,9 @@
 import { HeaderLogo } from "@/components/header-logo";
 import { Navigation } from "@/components/navigation";
 import { WelcomeMsg } from "@/components/welcome-msg";
+import { Filters } from "@/components/filters";
+
+import { Suspense } from "react";
 
 import { UserButton, ClerkLoading, ClerkLoaded } from "@clerk/nextjs";
 import { Loader2 } from "lucide-react";
@@ -24,6 +27,10 @@ export const Header = () => {
                     </ClerkLoading>
                 </div>
                 <WelcomeMsg />
+                {/* Filters read the URL with useSearchParams, which needs a Suspense boundary. */}
+                <Suspense>
+                    <Filters />
+                </Suspense>
             </div>
         </header>
     );

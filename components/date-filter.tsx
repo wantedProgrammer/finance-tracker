@@ -73,13 +73,13 @@ export const DateFilter = () => {
                 <Button
                   size="sm"
                   variant="outline"
-                  className="font-normal"
+                  className="w-full lg:w-auto font-normal bg-white/10 hover:bg-white/20 hover:text-white border-none focus-visible:ring-offset-0 focus-visible:ring-transparent outline-none text-white focus:bg-white/30 transition"
                 >
                     <span>{formatRange(currentRange)}</span>
                     <ChevronDown className="size-4 opacity-50" />
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="end">
+            <PopoverContent className="w-auto p-0" align="start">
                 <Calendar
                   mode="range"
                   defaultMonth={date?.from}

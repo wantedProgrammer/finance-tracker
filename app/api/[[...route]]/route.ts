@@ -9,6 +9,7 @@ import categories from "./categories";
 import transactions from './transactions';
 import summary from "./summary";
 import data from "./data";
+import bankConnections from "./bank-connections";
 
 const app = new Hono().basePath('/api')
 
@@ -27,7 +28,8 @@ const routes = app
   .route("/categories", categories)
   .route("/transactions", transactions)
   .route("/summary", summary)
-  .route("/data", data);
+  .route("/data", data)
+  .route("/bank-connections", bankConnections);
    
 
 export const GET = handle(app)

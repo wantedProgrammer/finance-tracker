@@ -39,7 +39,7 @@ A full-stack personal finance web app for tracking income and expenses across mu
 
 ### Planned extensions (my own additions)
 
-- [ ] Investec Programmable Banking integration (sandbox)
+- [x] Investec Programmable Banking integration (sandbox)
 - [ ] CSV import presets for major SA banks (FNB, Capitec, Standard Bank, Absa, Nedbank)
 - [ ] Budget planning per category
 - [ ] Recurring transactions
@@ -138,6 +138,12 @@ CLERK_SECRET_KEY=your_clerk_secret_key
 DATABASE_URL=your_neon_connection_string
 
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Investec Programmable Banking (server-side only, never prefix with NEXT_PUBLIC_)
+INVESTEC_BASE_URL=https://openapisandbox.investec.com
+INVESTEC_CLIENT_ID=your_investec_client_id
+INVESTEC_CLIENT_SECRET=your_investec_client_secret
+INVESTEC_API_KEY=your_investec_api_key
 ```
 
 ### 3. Run database migrations

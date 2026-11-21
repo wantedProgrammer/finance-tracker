@@ -4,7 +4,6 @@
 
 A full-stack personal finance web app for tracking income and expenses across multiple accounts. Built with Next.js, Hono, Drizzle ORM and Neon PostgreSQL, with authentication handled by Clerk.
 
-
 ---
 
 ## ✅ What works today
@@ -26,10 +25,10 @@ A full-stack personal finance web app for tracking income and expenses across mu
 - [x] Database setup (Drizzle + Neon)
 - [x] Accounts: create, read, update, delete
 - [x] Accounts: data table with bulk delete
-- [ ] Categories: create, read, update, delete
-- [ ] Transactions API
-- [ ] Transactions form (income / expense toggle)
-- [ ] Transactions table with search and bulk delete
+- [X] Categories: create, read, update, delete
+- [X] Transactions API
+- [X] Transactions form (income / expense toggle)
+- [X] Transactions table with search and bulk delete
 - [ ] CSV import with preview before saving
 - [ ] Summary API
 - [ ] Dashboard summary cards
@@ -40,11 +39,22 @@ A full-stack personal finance web app for tracking income and expenses across mu
 
 ### Planned extensions (my own additions)
 
+- [ ] Investec Programmable Banking integration (sandbox)
+- [ ] CSV import presets for major SA banks (FNB, Capitec, Standard Bank, Absa, Nedbank)
 - [ ] Budget planning per category
 - [ ] Recurring transactions
 - [ ] Financial goals
 - [ ] Export reports as PDF
 - [ ] Multi-currency support
+
+---
+
+## 🏦 Bank connections
+
+This app is built with South African banks in mind. Popular aggregators like Plaid don't support South African banks, so transactions are brought in two ways:
+
+- **CSV import:** works with any bank that lets you download your transaction history. Columns are mapped during upload, so different bank formats are supported.
+- **Investec API (planned):** a direct connection for Investec clients through Investec Programmable Banking, developed against Investec's sandbox.
 
 ---
 
@@ -54,6 +64,7 @@ A full-stack personal finance web app for tracking income and expenses across mu
 | --- | --- |
 | Framework | Next.js (App Router), React, TypeScript |
 | Styling | Tailwind CSS v4, shadcn/ui |
+| Tables | TanStack Table v8 |
 | Forms & validation | React Hook Form, Zod |
 | Data fetching | TanStack Query |
 | API | Hono |
@@ -104,7 +115,7 @@ proxy.ts        Clerk route protection (formerly middleware.ts)
 
 ### Prerequisites
 
-- Node.js 18 or later
+- Node.js 20.19 or later (current LTS recommended)
 - A [Neon](https://neon.tech/) PostgreSQL database
 - A [Clerk](https://clerk.com/) application
 

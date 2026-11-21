@@ -82,6 +82,26 @@ export const normalizePayee = (payee: string) =>
       .replace(/\s+/g, " ")
       .trim();
 
+// Readable payee for display: "FOOD ZONE 5196*1931 13 MAY" -> "Food Zone".
+// Only tidies ALL-CAPS bank text; payees typed by hand ("Tanaka") are left as they are.
+export const formatPayee = (payee: string) => {
+    if (payee !== payee.toUpperCase()) return payee;
+
+    const words = normalizePayee(payee).split(" ");
+
+    // Drop one-letter card-processor prefixes like "C*", "M*" and "U*".
+    while (words.length > 1 && words[0].length === 1) words.shift();
+
+    const cleaned = words.join(" ");
+
+    // Nothing readable left (e.g. "0844613256 11H06 335317916"): show the original.
+    if (cleaned.length < MIN_PATTERN_LENGTH) return payee;
+
+    return cleaned
+      .toLowerCase()
+      .replace(/\b[a-z]/g, (letter) => letter.toUpperCase());
+};
+
 // Learned patterns shorter than this are too vague to apply to other transactions.
 export const MIN_PATTERN_LENGTH = 3;
 

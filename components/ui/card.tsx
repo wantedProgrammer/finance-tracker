@@ -6,7 +6,8 @@ function Card({ className, ...props }: React.ComponentProps<"div">) {
     <div
       data-slot="card"
       className={cn(
-        "flex flex-col gap-6 rounded-xl border bg-card py-6 text-card-foreground shadow-sm",
+        // Horizon card: a hairline border plus a soft, layered shadow instead of shadcn's stock shadow.
+        "flex flex-col gap-6 rounded-2xl border border-slate-900/[0.06] dark:border-white/10 bg-card py-6 text-card-foreground shadow-[0_1px_2px_rgb(15_23_42/0.04),0_12px_32px_-16px_rgb(15_23_42/0.18)]",
         className
       )}
       {...props}
@@ -31,7 +32,8 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn("leading-none font-semibold", className)}
+      // Horizon: card titles use the display serif (it only has a regular weight).
+      className={cn("font-display font-normal leading-none tracking-tight", className)}
       {...props}
     />
   )

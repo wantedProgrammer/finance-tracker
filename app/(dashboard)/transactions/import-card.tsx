@@ -164,10 +164,10 @@ export const ImportCard = ({
 
     return (
         <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
-            <Card className="border-none drop-shadow-sm">
+            <Card>
                 <CardHeader className="flex flex-col gap-y-2 lg:flex-row lg:items-center lg:justify-between">
                     <div className="space-y-1">
-                        <CardTitle className="text-xl line-clamp-1">
+                        <CardTitle className="text-2xl line-clamp-1">
                             Import Transactions
                         </CardTitle>
                         <p className="text-sm text-muted-foreground">

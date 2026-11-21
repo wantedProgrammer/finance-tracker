@@ -71,7 +71,11 @@ const app = new Hono()
       const [lastPeriod] = await fetchFinancialData(lastPeriodStart, lastPeriodEnd);
 
       const incomeChange = calculatePercentageChange(currentPeriod.income, lastPeriod.income);
-      const expensesChange = calculatePercentageChange(currentPeriod.expenses, lastPeriod.expenses);
+      // Compare spending as positive amounts so "spent more" is a positive change.
+      const expensesChange = calculatePercentageChange(
+        Math.abs(currentPeriod.expenses),
+        Math.abs(lastPeriod.expenses),
+      );
       const remainingChange = calculatePercentageChange(currentPeriod.remaining, lastPeriod.remaining);
 
       const categoryName = sql<string>`COALESCE(${categories.name}, 'Uncategorized')`;
@@ -137,6 +141,10 @@ const app = new Hono()
           incomeChange,
           expensesAmount: currentPeriod.expenses,
           expensesChange,
+          // Previous period totals, so the dashboard can say "R 1,200 more than before".
+          previousRemainingAmount: lastPeriod.remaining,
+          previousIncomeAmount: lastPeriod.income,
+          previousExpensesAmount: lastPeriod.expenses,
           categories: finalCategories,
           days,
         },

@@ -29,9 +29,9 @@ export const ProfileCard = () => {
     const email = user?.primaryEmailAddress?.emailAddress;
 
     return (
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader>
-                <CardTitle className="text-xl">Profile</CardTitle>
+                <CardTitle className="text-2xl">Profile</CardTitle>
                 <CardDescription>Your account details</CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col sm:flex-row sm:items-center gap-4">

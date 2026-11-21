@@ -16,6 +16,9 @@ const badgeVariants = cva(
         outline:
           "border-border text-foreground [a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         primary: "border-transparent bg-blue-500/10 text-blue-500",
+        // Money in and out. The darker "strong" text shades pass AA on the light tint.
+        income: "border-transparent bg-income/10 text-income-strong",
+        expense: "border-transparent bg-expense/10 text-expense-strong",
         ghost: "[a&]:hover:bg-accent [a&]:hover:text-accent-foreground",
         link: "text-primary underline-offset-4 [a&]:hover:underline",
       },

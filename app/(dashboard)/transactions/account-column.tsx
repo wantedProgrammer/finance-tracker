@@ -23,7 +23,7 @@ export const AccountColumn = ({
     return (
         <div
         onClick={onClick}
-          className="flex items-center cursor-pointer hover-underline">   
+          className="flex items-center cursor-pointer hover:underline">   
             {account}
         </div>
     );

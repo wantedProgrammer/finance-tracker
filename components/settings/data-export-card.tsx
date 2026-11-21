@@ -16,9 +16,9 @@ export const DataExportCard = () => {
     const exportTransactions = useExportTransactions();
 
     return (
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader>
-                <CardTitle className="text-xl">Data export</CardTitle>
+                <CardTitle className="text-2xl">Data export</CardTitle>
                 <CardDescription>
                     Download all your transactions as a CSV file. Filters are ignored.
                 </CardDescription>

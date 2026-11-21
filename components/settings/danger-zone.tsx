@@ -31,9 +31,9 @@ export const DangerZone = () => {
     return (
         <>
             <ConfirmDialog />
-            <Card className="border border-rose-500/50 drop-shadow-sm">
+            <Card className="border-rose-500/50">
                 <CardHeader>
-                    <CardTitle className="text-xl text-rose-500">Danger zone</CardTitle>
+                    <CardTitle className="text-2xl text-rose-500">Danger zone</CardTitle>
                     <CardDescription>
                         Permanently delete all your accounts, categories and transactions.
                     </CardDescription>

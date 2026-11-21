@@ -28,8 +28,8 @@ export const CategoryColumn = ({
         <div
         onClick={onClick}
           className={cn(
-            "flex items-center cursor-pointer hover-underline",
-            !category && "text-rose-500",
+            "flex items-center cursor-pointer hover:underline",
+            !category && "text-destructive",
           )}>
             {category ?? "Uncategorized"}
         </div>

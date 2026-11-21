@@ -15,9 +15,9 @@ import {
 // Placeholder for the Investec integration. Replace this component when it's built.
 export const BankConnections = () => {
     return (
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader>
-                <CardTitle className="text-xl">Bank connections</CardTitle>
+                <CardTitle className="text-2xl">Bank connections</CardTitle>
                 <CardDescription>Connect a bank to import transactions automatically</CardDescription>
             </CardHeader>
             <CardContent>

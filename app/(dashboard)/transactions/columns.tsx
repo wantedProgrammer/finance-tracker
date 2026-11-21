@@ -7,9 +7,9 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { InferResponseType } from "hono"
 import { Actions } from "./actions"
 import { format } from "date-fns"
-import { formatCurrency } from "@/lib/utils"
+import { cn, formatCurrency } from "@/lib/utils"
+import { formatPayee } from "@/lib/categorize"
 import { client } from "@/lib/hono"
-import { Badge } from "@/components/ui/badge"
 import { AccountColumn } from "./account-column"
 import { CategoryColumn } from "./category-column"
 
@@ -97,6 +97,16 @@ export const columns: ColumnDef<ResponseType>[] = [
         </Button>
       )
     },
+    cell: ({ row }) => {
+      const payee = row.original.payee;
+
+      // Readable name in the table; hover shows the original bank text.
+      return (
+        <span title={payee}>
+          {formatPayee(payee)}
+        </span>
+      )
+    }
   },
   {
     accessorKey: "amount",
@@ -114,12 +124,18 @@ export const columns: ColumnDef<ResponseType>[] = [
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue("amount"));
 
+      // Plain, aligned figures: money in is green with a "+", spending stays neutral
+      // so the list doesn't turn into a wall of red.
       return (
-        <Badge
-          variant={amount < 0 ? "destructive" : "primary"}
-          className="text-xs font-medium px-3.5 py-2.5">  
+        <span
+          className={cn(
+            "font-medium tabular-nums whitespace-nowrap",
+            amount > 0 && "text-income-strong",
+          )}
+        >
+          {amount > 0 && "+"}
           {formatCurrency(amount)}
-        </Badge>
+        </span>
       )
     }
   },

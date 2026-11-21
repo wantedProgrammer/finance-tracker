@@ -33,7 +33,7 @@ const CategoriesPage = () => {
 if (categoryQuery.isLoading) {
     return (
         <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
-            <Card className="border-none drop-shadow-sm">
+            <Card>
                 <CardHeader>
                     <Skeleton className="h-8 w-48" />
                 </CardHeader>
@@ -51,9 +51,9 @@ if (categoryQuery.isLoading) {
 
   return (
     <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-x-2">
-                <CardTitle className="text-xl line-clamp-1 min-w-0">
+                <CardTitle className="text-2xl line-clamp-1 min-w-0">
                     Categories Page
                 </CardTitle>
                 <Button onClick={newCategory.onOpen} size="sm" className="shrink-0"> 

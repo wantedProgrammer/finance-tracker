@@ -106,7 +106,7 @@ export function DataTable<TData, TValue>({
               
             }}
           >
-            <Trash className="size-4 mr-2" />
+            <Trash className="size-4" />
               Delete({table.getFilteredSelectedRowModel().rows.length})
           </Button>
         )}

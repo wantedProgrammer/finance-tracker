@@ -2,7 +2,9 @@ import type { TooltipContentProps } from "recharts";
 
 import { formatCurrency } from "@/lib/utils";
 
-export const CATEGORY_COLORS = ["#0062FF", "#12C6FF", "#FF647F", "#FF9354"];
+// The biggest category (first) gets the orange highlight. The old fourth colour
+// (#FF9354) was also orange, so it's dropped to keep the highlight unique.
+export const CATEGORY_COLORS = ["var(--highlight)", "#0062FF", "#12C6FF", "#FF647F"];
 
 export type CategoryData = {
     name: string;

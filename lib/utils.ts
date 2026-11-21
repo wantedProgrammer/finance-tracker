@@ -28,8 +28,10 @@ export function calculatePercentageChange(
   current: number,
   previous: number,
 ) {
+  // From zero, report a full 100% move in whichever direction the value went.
   if (previous === 0) {
-    return current === 0 ? 0 : 100;
+    if (current === 0) return 0;
+    return current > 0 ? 100 : -100;
   }
 
   // Divide by the absolute value so the sign shows the direction of change,

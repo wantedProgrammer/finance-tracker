@@ -3,8 +3,9 @@ import type { TooltipContentProps } from "recharts";
 
 import { formatCurrency } from "@/lib/utils";
 
-export const INCOME_COLOR = "#3b82f6";
-export const EXPENSES_COLOR = "#f43f5e";
+// Theme tokens from globals.css, so charts follow the shared colours and dark mode.
+export const INCOME_COLOR = "var(--income)";
+export const EXPENSES_COLOR = "var(--expense)";
 
 // Recharts v3 passes TooltipContentProps to custom tooltip content.
 export const CustomTooltip = ({

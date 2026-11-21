@@ -35,10 +35,10 @@ export const SpendingPie = ({ data = [] }: Props) => {
     const hasData = data.some((category) => category.value > 0);
 
     return (
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-x-4">
                 <div className="space-y-1 min-w-0">
-                    <CardTitle className="text-xl line-clamp-1">
+                    <CardTitle className="text-2xl line-clamp-1">
                         Categories
                     </CardTitle>
                     <p className="text-sm text-muted-foreground line-clamp-1">
@@ -91,7 +91,7 @@ export const SpendingPie = ({ data = [] }: Props) => {
 
 export const SpendingPieLoading = () => {
     return (
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-x-4">
                 <Skeleton className="h-8 w-48" />
                 <Skeleton className="h-9 w-full lg:w-[120px]" />

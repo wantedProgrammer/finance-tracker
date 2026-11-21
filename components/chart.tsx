@@ -66,10 +66,10 @@ export const Chart = ({ data = [] }: Props) => {
     const chartData = isWeekly ? groupByWeek(data) : data;
 
     return (
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-x-4">
                 <div className="space-y-1 min-w-0">
-                    <CardTitle className="text-xl line-clamp-1">
+                    <CardTitle className="text-2xl line-clamp-1">
                         Transactions
                     </CardTitle>
                     <p className="text-sm text-muted-foreground line-clamp-1">
@@ -122,7 +122,7 @@ export const Chart = ({ data = [] }: Props) => {
 
 export const ChartLoading = () => {
     return (
-        <Card className="border-none drop-shadow-sm">
+        <Card>
             <CardHeader className="flex flex-row items-center justify-between gap-x-4">
                 <Skeleton className="h-8 w-48" />
                 <Skeleton className="h-9 w-full lg:w-[120px]" />

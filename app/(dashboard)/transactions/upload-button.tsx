@@ -17,10 +17,10 @@ export const UploadButton = ({ onUpload }: Props) => {
             {({ getRootProps }: { getRootProps: () => object }) => (
                 <Button
                   size="sm"
-                  className="full-w lg:w-auto"
+                  className="w-full lg:w-auto"
                   {...getRootProps()}
                 >
-                    <UploadIcon className="size-4 mr-2" />
+                    <UploadIcon className="size-4" />
                     Import
                 </Button>
             )}

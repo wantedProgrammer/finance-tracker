@@ -8,7 +8,11 @@ import {
     Tooltip,
 } from "recharts";
 
-import { CATEGORY_COLORS, CategoryTooltip, type CategoryData } from "@/components/category-tooltip";
+import { CategoryTooltip, type CategoryData } from "@/components/category-tooltip";
+
+// The radar is one shape, so the orange highlight would cover the whole chart.
+// Brand blue keeps the accent for the pie and radial charts' top category.
+const RADAR_COLOR = "var(--brand)";
 
 type Props = {
     data: CategoryData[];
@@ -24,8 +28,8 @@ export const RadarVariant = ({ data }: Props) => {
                 <Tooltip content={CategoryTooltip} />
                 <Radar
                   dataKey="value"
-                  stroke={CATEGORY_COLORS[0]}
-                  fill={CATEGORY_COLORS[0]}
+                  stroke={RADAR_COLOR}
+                  fill={RADAR_COLOR}
                   fillOpacity={0.6}
                 />
             </RadarChart>

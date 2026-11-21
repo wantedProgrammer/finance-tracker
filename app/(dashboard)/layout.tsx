@@ -10,7 +10,8 @@ const DashboardLayout = ({ children }: Props) => {
     return (
         <>
           <Header />
-          <main className="px-3 lg:px-14">
+          {/* relative z-10 keeps page cards above the header, which they overlap by 6rem. */}
+          <main className="relative z-10 px-3 lg:px-14">
             {/* Pages read filters with useSearchParams, which needs a Suspense boundary to build. */}
             <Suspense>
               {children}

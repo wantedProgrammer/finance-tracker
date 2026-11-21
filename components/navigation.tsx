@@ -96,6 +96,9 @@ const NavigationLinks = ({ query }: { query: string }) => {
                               className="w-full justify-start"
                             >
                                 {route.label}
+                                {route.href == pathname && (
+                                    <span className="ml-auto size-1.5 rounded-full bg-highlight" />
+                                )}
                             </Button>
                         ))}
                     </nav>

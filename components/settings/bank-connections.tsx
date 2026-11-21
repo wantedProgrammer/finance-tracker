@@ -44,6 +44,12 @@ export const BankConnections = () => {
         }
     };
 
+    // Only users on INVESTEC_ALLOWED_USER_IDS see the integration. Others never see the card,
+    // not even while loading.
+    if (!connectionQuery.data?.isAvailable) {
+        return null;
+    }
+
     return (
         <>
             <ConfirmDialog />

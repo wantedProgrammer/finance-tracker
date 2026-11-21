@@ -25,6 +25,18 @@ const getConfig = () => {
     return { baseUrl: baseUrl.replace(/\/$/, ""), clientId, clientSecret, apiKey };
 };
 
+// The credentials above belong to one person, so anyone using them sees that person's
+// accounts. Only Clerk users listed in INVESTEC_ALLOWED_USER_IDS (comma-separated) may use
+// the integration. Not set means nobody: a missing setting can't expose bank data.
+export const isInvestecAllowed = (userId: string) => {
+    const allowed = (process.env.INVESTEC_ALLOWED_USER_IDS ?? "")
+      .split(",")
+      .map((id) => id.trim())
+      .filter(Boolean);
+
+    return allowed.includes(userId);
+};
+
 export const isInvestecSandbox = () =>
     (process.env.INVESTEC_BASE_URL ?? "").includes("sandbox");
 
@@ -64,7 +76,13 @@ const transactionsResponseSchema = z.object({
     data: z.object({
         transactions: z.array(transactionSchema),
     }),
+    meta: z.object({
+        totalPages: z.number().optional(),
+    }).optional(),
 });
+
+// Safety cap so a misbehaving response can never loop forever.
+const MAX_PAGES = 50;
 
 export type InvestecAccount = z.infer<typeof accountSchema>;
 export type InvestecTransaction = z.infer<typeof transactionSchema>;
@@ -143,15 +161,53 @@ export const listInvestecAccounts = async () => {
     return response.data.accounts;
 };
 
+// Reads every page. A real account with many transactions can return more than one page
+// (meta.totalPages); reading only the first would silently miss transactions.
 export const listInvestecTransactions = async (
     accountId: string,
     fromDate: string,
     toDate: string,
 ) => {
-    const params = new URLSearchParams({ fromDate, toDate });
-    const response = await investecGet(
-        `/za/pb/v1/accounts/${encodeURIComponent(accountId)}/transactions?${params}`,
-        transactionsResponseSchema,
-    );
-    return response.data.transactions;
+    const path = `/za/pb/v1/accounts/${encodeURIComponent(accountId)}/transactions`;
+    const getPage = (page: number) => {
+        const params = new URLSearchParams({ fromDate, toDate });
+        if (page > 1) params.set("page", String(page));
+        return investecGet(`${path}?${params}`, transactionsResponseSchema);
+    };
+
+    const firstPage = await getPage(1);
+    const totalPages = firstPage.meta?.totalPages ?? 1;
+
+    if (totalPages > MAX_PAGES) {
+        throw new InvestecError(
+            `Investec returned ${totalPages} pages of transactions. Sync a shorter period.`,
+        );
+    }
+
+    const transactions = [...firstPage.data.transactions];
+    const firstPageKey = firstPage.data.transactions.map((transaction) => transaction.uuid).join(",");
+
+    for (let page = 2; page <= totalPages; page++) {
+        const nextPage = await getPage(page);
+        const pageKey = nextPage.data.transactions.map((transaction) => transaction.uuid).join(",");
+
+        // If Investec ignored the page parameter we'd get page 1 again. Stop loudly rather
+        // than import an incomplete set and report it as up to date.
+        if (pageKey === firstPageKey) {
+            throw new InvestecError(
+                "Investec returned more pages than Horizon could read. Sync stopped so no transactions are missed.",
+            );
+        }
+
+        transactions.push(...nextPage.data.transactions);
+    }
+
+    // Drop any transaction that appears on two pages.
+    const seen = new Set<string>();
+    return transactions.filter((transaction) => {
+        if (!transaction.uuid) return true;
+        if (seen.has(transaction.uuid)) return false;
+        seen.add(transaction.uuid);
+        return true;
+    });
 };

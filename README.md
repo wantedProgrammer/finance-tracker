@@ -144,6 +144,9 @@ INVESTEC_BASE_URL=https://openapisandbox.investec.com
 INVESTEC_CLIENT_ID=your_investec_client_id
 INVESTEC_CLIENT_SECRET=your_investec_client_secret
 INVESTEC_API_KEY=your_investec_api_key
+# Clerk user IDs allowed to use the integration (comma-separated). The credentials above
+# belong to one person, so leave this empty or unset to disable the integration for everyone.
+INVESTEC_ALLOWED_USER_IDS=user_xxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
 ### 3. Run database migrations

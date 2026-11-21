@@ -13,6 +13,7 @@ import { convertAmountToMiliUnits } from "@/lib/utils";
 import { autoCategorize } from "@/lib/auto-categorize";
 import {
   InvestecError,
+  isInvestecAllowed,
   isInvestecSandbox,
   listInvestecAccounts,
   listInvestecTransactions,
@@ -86,6 +87,18 @@ const app = new Hono()
         return c.json({ error: "Unauthorized" }, 401);
       }
 
+      // Not on the allowlist: report "not available" (not an error) so the settings page
+      // simply hides the Investec card. Nothing about the Investec account is returned.
+      if (!isInvestecAllowed(auth.userId)) {
+        return c.json({
+          data: {
+            connection: null,
+            isSandbox: false,
+            isAvailable: false,
+          },
+        });
+      }
+
       const [connection] = await db
         .select({
           id: bankConnections.id,
@@ -106,6 +119,7 @@ const app = new Hono()
         data: {
           connection: connection ?? null,
           isSandbox: isInvestecSandbox(),
+          isAvailable: true,
         },
       });
     },
@@ -118,6 +132,10 @@ const app = new Hono()
 
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      if (!isInvestecAllowed(auth.userId)) {
+        return c.json({ error: "Not available" }, 403);
       }
 
       try {
@@ -153,6 +171,10 @@ const app = new Hono()
 
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      if (!isInvestecAllowed(auth.userId)) {
+        return c.json({ error: "Not available" }, 403);
       }
 
       const [ownedAccount] = await db
@@ -213,6 +235,10 @@ const app = new Hono()
 
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      if (!isInvestecAllowed(auth.userId)) {
+        return c.json({ error: "Not available" }, 403);
       }
 
       const [connection] = await db
@@ -315,6 +341,10 @@ const app = new Hono()
 
       if (!auth?.userId) {
         return c.json({ error: "Unauthorized" }, 401);
+      }
+
+      if (!isInvestecAllowed(auth.userId)) {
+        return c.json({ error: "Not available" }, 403);
       }
 
       // Only the connection is removed; imported transactions stay in the account.

@@ -11,7 +11,8 @@ const SettingsPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <ProfileCard />
                 <DataExportCard />
-                <div className="lg:col-span-2">
+                {/* empty:hidden removes the gap when the Investec card isn't shown. */}
+                <div className="lg:col-span-2 empty:hidden">
                     <BankConnections />
                 </div>
                 <div className="lg:col-span-2">

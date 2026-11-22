@@ -1,125 +1,73 @@
-# 💰 Finance Tracker
+# 💰 Horizon: Personal Finance Tracker
 
-> 🚧 **Work in progress.** Authentication and account management are working. Categories, transactions, CSV import and the analytics dashboard are being built next. See the [roadmap](#️-roadmap) for current status.
+A full-stack personal finance app built for South African banks. Track income and expenses across accounts, import bank statements (CSV or PDF), sync Investec transactions, and see where your money goes on an interactive dashboard.
 
-A full-stack personal finance web app for tracking income and expenses across multiple accounts. Built with Next.js, Hono, Drizzle ORM and Neon PostgreSQL, with authentication handled by Clerk.
+🔗 **Live demo:** https://finance-tracker-wheat-eight.vercel.app
 
----
-
-## ✅ What works today
-
-- 🔐 Sign up, sign in and protected routes with Clerk
-- 🏦 Create, view, edit and delete financial accounts
-- 🗑️ Bulk delete accounts from a data table
-- ⚡ Type-safe REST API built with Hono, running inside Next.js route handlers
-- 🗄️ PostgreSQL schema and migrations managed with Drizzle ORM, hosted on Neon
+![Dashboard](docs/screenshots/dashboard.png)
 
 ---
 
-## 🗺️ Roadmap
+## ✨ Features
 
-### Core features
+- 📊 **Dashboard:** remaining, income and expense cards with period comparisons, switchable area/line/bar charts, and spending by category (pie, radar or radial)
+- 🗓️ **Filters:** by account and date range, applied across the whole app
+- 💳 **Transactions:** add, edit, search, categorize and bulk delete
+- 📄 **Statement import:** CSV with column mapping, and PDF (Standard Bank) parsed in the browser, with duplicate detection
+- 🏦 **Investec sync:** connects to Investec Programmable Banking (sandbox) and imports transactions without duplicates
+- ⚙️ **Settings:** profile, CSV export of all transactions, bank connections and delete-all-data
+- 🔐 **Auth:** branded sign-in and sign-up with email or Google, via Clerk
 
-- [x] Authentication (Clerk)
-- [x] Hono API setup
-- [x] Database setup (Drizzle + Neon)
-- [x] Accounts: create, read, update, delete
-- [x] Accounts: data table with bulk delete
-- [X] Categories: create, read, update, delete
-- [X] Transactions API
-- [X] Transactions form (income / expense toggle)
-- [X] Transactions table with search and bulk delete
-- [ ] CSV import with preview before saving
-- [ ] Summary API
-- [ ] Dashboard summary cards
-- [ ] Dashboard charts (switchable chart types)
-- [ ] Spending breakdown by category
-- [ ] Date range and account filters
-- [ ] Deploy to Vercel
+## 🇿🇦 Why South African banks?
 
-### Planned extensions (my own additions)
+Aggregators like Plaid don't support South African banks, so Horizon brings transactions in through statement imports, which work with any bank, and a direct Investec API integration.
 
-- [x] Investec Programmable Banking integration (sandbox)
-- [ ] CSV import presets for major SA banks (FNB, Capitec, Standard Bank, Absa, Nedbank)
-- [ ] Budget planning per category
-- [ ] Recurring transactions
-- [ ] Financial goals
-- [ ] Export reports as PDF
-- [ ] Multi-currency support
+## 📸 Screenshots
 
----
+| Charts | Transactions |
+| --- | --- |
+| ![Charts](docs/screenshots/charts.png) | ![Transactions](docs/screenshots/transactions.png) |
 
-## 🏦 Bank connections
+| PDF statement import | Investec connection |
+| --- | --- |
+| ![PDF import](docs/screenshots/pdf-import.png) | ![Investec connection](docs/screenshots/investec-connect.png) |
 
-This app is built with South African banks in mind. Popular aggregators like Plaid don't support South African banks, so transactions are brought in two ways:
+| Settings | Sign in |
+| --- | --- |
+| ![Settings](docs/screenshots/settings.png) | ![Sign in](docs/screenshots/sign-in.png) |
 
-- **CSV import:** works with any bank that lets you download your transaction history. Columns are mapped during upload, so different bank formats are supported.
-- **Investec API (planned):** a direct connection for Investec clients through Investec Programmable Banking, developed against Investec's sandbox.
+<details>
+<summary>More screenshots</summary>
 
----
+| Chart types | More chart types |
+| --- | --- |
+| ![Line and radar charts](docs/screenshots/charts-line-radar.png) | ![Bar and radial charts](docs/screenshots/charts-bar-radial.png) |
+
+| New transaction | Accounts |
+| --- | --- |
+| ![New transaction form](docs/screenshots/transaction-form.png) | ![Accounts](docs/screenshots/accounts.png) |
+
+| Edit account | Categories |
+| --- | --- |
+| ![Edit account](docs/screenshots/edit-account.png) | ![Categories](docs/screenshots/categories.png) |
+
+</details>
 
 ## 🛠️ Tech Stack
 
-| Layer | Tools |
-| --- | --- |
-| Framework | Next.js (App Router), React, TypeScript |
-| Styling | Tailwind CSS v4, shadcn/ui |
-| Tables | TanStack Table v8 |
-| Forms & validation | React Hook Form, Zod |
-| Data fetching | TanStack Query |
-| API | Hono |
-| Database | Neon PostgreSQL, Drizzle ORM |
-| Auth | Clerk |
-| Charts (planned) | Recharts |
-| CSV parsing (planned) | PapaParse |
+Next.js 16 · React · TypeScript · Tailwind CSS v4 · shadcn/ui · Hono · Drizzle ORM · Neon PostgreSQL · Clerk · TanStack Query · TanStack Table · Recharts · pdf.js · Vercel
 
----
+## 🗺️ Roadmap
 
-## 🏗️ Architecture
-
-```
-Client (Next.js + React + TanStack Query)
-            │
-            ▼
-   Hono API (app/api/[[...route]])
-            │
-            ▼
-       Drizzle ORM
-            │
-            ▼
-     Neon PostgreSQL
-```
-
-Each feature lives in its own folder under `features/`, containing its API hooks (queries and mutations) and UI components such as sheets and forms. The API routes are defined with Hono and share types with the client through Hono's RPC client, so request and response shapes are checked end to end.
-
----
-
-## 📂 Project Structure
-
-```
-app/            Next.js routes, layouts and the Hono API entry point
-components/     Shared UI components (shadcn/ui and custom)
-db/             Drizzle schema and database client
-drizzle/        Generated SQL migrations
-features/       Feature modules (accounts, and later categories and transactions)
-lib/            Utilities and the typed Hono client
-providers/      React context providers (query client, sheets)
-public/         Static assets
-scripts/        Helper scripts (e.g. seeding)
-proxy.ts        Clerk route protection (formerly middleware.ts)
-```
-
----
+- [ ] PDF parsers for FNB, Capitec, Absa and Nedbank
+- [ ] Budgets per category
+- [ ] Recurring transactions
+- [ ] Financial goals
+- [ ] Multi-currency support
 
 ## ⚙️ Getting Started
 
-### Prerequisites
-
-- Node.js 20.19 or later (current LTS recommended)
-- A [Neon](https://neon.tech/) PostgreSQL database
-- A [Clerk](https://clerk.com/) application
-
-### 1. Clone and install
+**Prerequisites:** Node.js 20.19+, a [Neon](https://neon.tech/) database and a [Clerk](https://clerk.com/) application.
 
 ```bash
 git clone https://github.com/wantedProgrammer/finance-tracker.git
@@ -127,51 +75,32 @@ cd finance-tracker
 npm install
 ```
 
-### 2. Set up environment variables
-
-Create a `.env.local` file in the project root:
+Create `.env.local` in the project root:
 
 ```env
 NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
+CLERK_PUBLISHABLE_KEY=your_clerk_publishable_key
 CLERK_SECRET_KEY=your_clerk_secret_key
+NEXT_PUBLIC_CLERK_SIGN_IN_URL=/sign-in
+NEXT_PUBLIC_CLERK_SIGN_UP_URL=/sign-up
 
 DATABASE_URL=your_neon_connection_string
-
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
-# Investec Programmable Banking (server-side only, never prefix with NEXT_PUBLIC_)
+# Investec (server-side only, never prefix with NEXT_PUBLIC_)
 INVESTEC_BASE_URL=https://openapisandbox.investec.com
 INVESTEC_CLIENT_ID=your_investec_client_id
 INVESTEC_CLIENT_SECRET=your_investec_client_secret
 INVESTEC_API_KEY=your_investec_api_key
-# Clerk user IDs allowed to use the integration (comma-separated). The credentials above
-# belong to one person, so leave this empty or unset to disable the integration for everyone.
-INVESTEC_ALLOWED_USER_IDS=user_xxxxxxxxxxxxxxxxxxxxxxxxxx
+# Comma-separated Clerk user IDs allowed to use the integration. Leave empty to disable it.
+INVESTEC_ALLOWED_USER_IDS=
 ```
 
-### 3. Run database migrations
+Run the migrations and start the dev server:
 
 ```bash
-npx drizzle-kit generate
 npx drizzle-kit migrate
-```
-
-To browse the database in your browser:
-
-```bash
-npx drizzle-kit studio
-```
-
-### 4. Start the development server
-
-```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and sign in to get started.
-
----
-
-## 📸 Screenshots
-
-Screenshots will be added once the dashboard is complete.
+Open [http://localhost:3000](http://localhost:3000) and sign in.

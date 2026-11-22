@@ -6,6 +6,7 @@ import { standardBankParser } from "./standard-bank";
 import { mukuruParser } from "./mukuru";
 import { capitecParser } from "./capitec";
 import { fnbParser } from "./fnb";
+import { absaParser } from "./absa";
 import { genericParser } from "./generic";
 
 // Add new bank parsers here. The first parser whose detect() matches is used, so the
@@ -15,6 +16,7 @@ export const STATEMENT_PARSERS: StatementParser[] = [
     mukuruParser,
     capitecParser,
     fnbParser,
+    absaParser,
     genericParser,
 ];
 

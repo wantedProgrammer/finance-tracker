@@ -51,6 +51,14 @@ export const PdfImportCard = ({
     const needsConfirmation = isGeneric && check.ok && !check.verified;
     const canImport = !disabled && !blocked && (!needsConfirmation || confirmed);
 
+    // Only the printed running balance is off, and the transactions still add up from the first
+    // balance to the last: the statement's printing, not a misread. Shown as a calmer note.
+    const printingIssueOnly = !check.ok
+        && check.endsMatch
+        && check.balanceMismatches.length > 0
+        && check.issues.length === 1;
+    const mismatchByIndex = new Map(check.balanceMismatches.map((mismatch) => [mismatch.index, mismatch]));
+
     const moneyIn = rows.filter((row) => row.amount > 0).reduce((sum, row) => sum + row.amount, 0);
     const moneyOut = rows.filter((row) => row.amount < 0).reduce((sum, row) => sum + row.amount, 0);
     const hasBalance = rows.some((row) => row.balance !== undefined);
@@ -136,7 +144,21 @@ export const PdfImportCard = ({
                             )}
                         </div>
                     )}
-                    {!check.ok && (
+                    {printingIssueOnly && !blocked && (
+                        <div className="flex gap-x-2 rounded-md border border-yellow-500/40 bg-yellow-500/5 p-3 text-sm">
+                            <AlertTriangle className="size-4 shrink-0 text-yellow-600 mt-0.5" />
+                            <div className="space-y-1">
+                                <p className="font-medium">The transactions add up, but the statement&apos;s printed balance doesn&apos;t.</p>
+                                <p className="text-muted-foreground">{check.issues[0]}</p>
+                                <p className="text-muted-foreground">
+                                    From the first balance to the last, every amount is accounted for, so the
+                                    amounts look right. The highlighted rows show where the printed balance
+                                    jumps; compare them with your statement if you want to be sure.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                    {!check.ok && (!printingIssueOnly || blocked) && (
                         <div className="flex gap-x-2 rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm">
                             <AlertTriangle className="size-4 shrink-0 text-destructive mt-0.5" />
                             <div className="space-y-1">
@@ -167,8 +189,11 @@ export const PdfImportCard = ({
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {rows.map((row) => (
-                                    <TableRow key={row.externalId}>
+                                {rows.map((row, index) => (
+                                    <TableRow
+                                      key={row.externalId}
+                                      className={cn(mismatchByIndex.has(index) && "bg-yellow-500/10 hover:bg-yellow-500/15")}
+                                    >
                                         <TableCell className="whitespace-nowrap">
                                             {format(row.date, "dd MMM yyyy")}
                                         </TableCell>
@@ -188,6 +213,11 @@ export const PdfImportCard = ({
                                         {hasBalance && (
                                             <TableCell className="text-right tabular-nums whitespace-nowrap text-muted-foreground">
                                                 {row.balance !== undefined ? formatCurrency(row.balance) : ""}
+                                                {mismatchByIndex.has(index) && (
+                                                    <p className="text-xs text-yellow-700">
+                                                        Expected {formatCurrency(mismatchByIndex.get(index)!.expected)}
+                                                    </p>
+                                                )}
                                             </TableCell>
                                         )}
                                     </TableRow>

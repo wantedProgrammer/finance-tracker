@@ -1,8 +1,10 @@
 import type { PdfLine } from "@/lib/pdf/extract-lines";
+import { format } from "date-fns";
 import { formatCurrency } from "@/lib/utils";
 import type { StatementCheck, StatementParser, StatementRow, StatementTotals } from "./types";
 import { standardBankParser } from "./standard-bank";
 import { mukuruParser } from "./mukuru";
+import { capitecParser } from "./capitec";
 import { genericParser } from "./generic";
 
 // Add new bank parsers here. The first parser whose detect() matches is used, so the
@@ -10,6 +12,7 @@ import { genericParser } from "./generic";
 export const STATEMENT_PARSERS: StatementParser[] = [
     standardBankParser,
     mukuruParser,
+    capitecParser,
     genericParser,
 ];
 
@@ -40,20 +43,33 @@ const checkStatement = (rows: StatementRow[], totals: StatementTotals, warnings:
     const issues: string[] = [...warnings];
 
     let previous = totals.openingBalance;
-    let balanceBreaks = 0;
     let balancesChecked = 0;
+    const balanceMismatches: StatementCheck["balanceMismatches"] = [];
 
-    for (const row of rows) {
+    rows.forEach((row, index) => {
         if (row.balance === undefined) {
             previous = undefined;
-            continue;
+            return;
         }
         if (previous !== undefined) {
             balancesChecked++;
-            if (cents(previous + row.amount) !== cents(row.balance)) balanceBreaks++;
+            const expected = previous + row.amount;
+            if (cents(expected) !== cents(row.balance)) {
+                balanceMismatches.push({ index, expected, printed: row.balance });
+            }
         }
         previous = row.balance;
-    }
+    });
+
+    // Do the transactions add up from the first balance to the last? If so, mismatches in
+    // between are the statement's printed balances being off, not amounts misread.
+    const first = rows[0];
+    const lastRowBalance = rows.at(-1)?.balance;
+    const startBalance = totals.openingBalance
+        ?? (first?.balance !== undefined ? first.balance - first.amount : undefined);
+    const endsMatch = startBalance !== undefined
+        && lastRowBalance !== undefined
+        && cents(startBalance + rows.reduce((sum, row) => sum + row.amount, 0)) === cents(lastRowBalance);
 
     // Verified means the rows were actually compared with something on the statement:
     // nearly every row's running balance, or the statement's own totals.
@@ -62,8 +78,15 @@ const checkStatement = (rows: StatementRow[], totals: StatementTotals, warnings:
         || totals.closingBalance !== undefined;
     const verified = totalsAvailable || balancesChecked >= Math.max(1, rows.length - 1);
 
-    if (balanceBreaks > 0) {
-        issues.push(`${balanceBreaks} ${balanceBreaks === 1 ? "row doesn't" : "rows don't"} match the running balance.`);
+    if (balanceMismatches.length > 0) {
+        const count = balanceMismatches.length;
+        const dates = balanceMismatches
+          .slice(0, 5)
+          .map(({ index }) => format(rows[index].date, "d MMM"))
+          .join(", ");
+        issues.push(
+            `${count} ${count === 1 ? "row doesn't" : "rows don't"} match the running balance (${dates}${count > 5 ? ", …" : ""}).`,
+        );
     }
 
     const moneyIn = rows.filter((row) => row.amount > 0).reduce((sum, row) => sum + row.amount, 0);
@@ -81,7 +104,7 @@ const checkStatement = (rows: StatementRow[], totals: StatementTotals, warnings:
         issues.push(`The last balance is ${formatCurrency(lastBalance)}, but the statement ends on ${formatCurrency(totals.closingBalance)}.`);
     }
 
-    return { ok: issues.length === 0, verified, issues };
+    return { ok: issues.length === 0, verified, issues, balanceMismatches, endsMatch };
 };
 
 export const parseStatement = (lines: PdfLine[]) => {

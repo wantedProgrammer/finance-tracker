@@ -27,6 +27,11 @@ export type StatementCheck = {
     verified: boolean;
     // Plain-language problems, shown in the preview before importing.
     issues: string[];
+    // Rows whose printed balance doesn't follow from the previous row, by index in the rows.
+    balanceMismatches: { index: number; expected: number; printed: number }[];
+    // True when the transactions add up from the first balance to the last, even if some
+    // printed balances in between don't (a printing issue on the statement, not a misread).
+    endsMatch: boolean;
 };
 
 export type StatementParser = {

@@ -24,7 +24,7 @@ export const Header = () => {
             </div>
             <div className="max-w-screen-2xl mx-auto">
                 <div className="w-full flex items-center justify-between mb-14">
-                    <div className="flex items-center lg:gap-x-16">
+                    <div className="flex items-center gap-x-3 lg:gap-x-16">
                         <HeaderLogo />
                         <Navigation />
                     </div>

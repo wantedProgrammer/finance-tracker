@@ -178,12 +178,12 @@ export const ImportCard = ({
                               : `${transactions.length} transactions ready to import`}
                         </p>
                     </div>
-                    <div className="flex flex-col lg:flex-row items-center gap-2">
+                    <div className="flex w-full flex-col sm:flex-row items-center gap-2 lg:w-auto">
                         <Button
                           onClick={onCancel}
                           size="sm"
                           variant="outline"
-                          className="w-full lg:w-auto"
+                          className="w-full sm:w-auto"
                           disabled={disabled}
                         >
                             Cancel
@@ -191,7 +191,7 @@ export const ImportCard = ({
                         <Button
                           onClick={handleContinue}
                           size="sm"
-                          className="w-full lg:w-auto"
+                          className="w-full sm:w-auto"
                           disabled={!canContinue || disabled}
                         >
                             Continue ({REQUIRED_OPTIONS.length - missingOptions.length}/{REQUIRED_OPTIONS.length})

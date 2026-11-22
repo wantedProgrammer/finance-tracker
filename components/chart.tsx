@@ -67,7 +67,8 @@ export const Chart = ({ data = [] }: Props) => {
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between gap-x-4">
+            {/* Phones: title above a full-width chart type select. */}
+            <CardHeader className="flex flex-col gap-y-3 sm:flex-row sm:items-center sm:justify-between sm:gap-x-4">
                 <div className="space-y-1 min-w-0">
                     <CardTitle className="text-2xl line-clamp-1">
                         Transactions
@@ -80,7 +81,7 @@ export const Chart = ({ data = [] }: Props) => {
                   value={chartType}
                   onValueChange={(value) => setChartType(value as ChartType)}
                 >
-                    <SelectTrigger className="lg:w-auto h-9 rounded-md px-3">
+                    <SelectTrigger className="w-full sm:w-auto h-9 rounded-md px-3">
                         <SelectValue placeholder="Chart type" />
                     </SelectTrigger>
                     <SelectContent>

@@ -68,7 +68,7 @@ interface DataCardProps extends BoxVariants, IconVariants {
 };
 
 const NoPreviousData = () => (
-    <p className="flex items-center gap-x-1 text-sm text-muted-foreground line-clamp-1">
+    <p className="flex flex-wrap items-center gap-x-1 text-sm text-muted-foreground">
         <Minus className="size-4 shrink-0" />
         No activity in the previous period
     </p>
@@ -92,7 +92,7 @@ const Comparison = ({
     const Icon = difference > 0 ? ArrowUpRight : difference < 0 ? ArrowDownRight : Minus;
 
     return (
-        <p className="flex items-center gap-x-1 text-sm line-clamp-1">
+        <p className="flex flex-wrap items-center gap-x-1 text-sm">
             <span className={cn(
                 "inline-flex items-center gap-x-0.5 font-medium tabular-nums",
                 isGood && "text-income-strong",
@@ -126,7 +126,7 @@ const Delta = ({
     const label = percentageChange > 0 ? "Up" : percentageChange < 0 ? "Down" : "No change";
 
     return (
-        <p className="flex items-center gap-x-1 text-sm line-clamp-1">
+        <p className="flex flex-wrap items-center gap-x-1 text-sm">
             <span className={cn(
                 "inline-flex items-center gap-x-0.5 font-medium",
                 isGood && "text-income-strong",
@@ -177,7 +177,7 @@ export const DataCard = ({
                 <div className="space-y-2 min-w-0">
                     <p className={cn(
                         "font-display tracking-tight tabular-nums line-clamp-1 break-all",
-                        isHero ? "text-5xl lg:text-6xl" : "text-4xl",
+                        isHero ? "text-4xl sm:text-5xl lg:text-6xl" : "text-3xl sm:text-4xl",
                     )}>
                         <CountUp
                           preserveValue

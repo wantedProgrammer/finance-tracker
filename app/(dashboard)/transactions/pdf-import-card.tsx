@@ -78,7 +78,7 @@ export const PdfImportCard = ({
             <Card>
                 <CardHeader className="flex flex-col gap-y-2 lg:flex-row lg:items-center lg:justify-between">
                     <div className="space-y-1">
-                        <div className="flex items-center gap-x-2">
+                        <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                             <CardTitle className="text-2xl line-clamp-1">
                                 {isGeneric ? "Import statement" : `Import ${bankName} statement`}
                             </CardTitle>
@@ -87,18 +87,18 @@ export const PdfImportCard = ({
                         <p className="text-sm text-muted-foreground">
                             {rows.length} {rows.length === 1 ? "transaction" : "transactions"} found
                             {" · "}
-                            <span className="text-income-strong tabular-nums">+{formatCurrency(moneyIn)}</span>
+                            <span className="text-income-strong tabular-nums whitespace-nowrap">+{formatCurrency(moneyIn)}</span>
                             {" in · "}
-                            <span className="tabular-nums">{formatCurrency(moneyOut)}</span>
+                            <span className="tabular-nums whitespace-nowrap">{formatCurrency(moneyOut)}</span>
                             {" out"}
                         </p>
                     </div>
-                    <div className="flex flex-col lg:flex-row items-center gap-2">
+                    <div className="flex w-full flex-col sm:flex-row items-center gap-2 lg:w-auto">
                         <Button
                           onClick={onCancel}
                           size="sm"
                           variant="outline"
-                          className="w-full lg:w-auto"
+                          className="w-full sm:w-auto"
                           disabled={disabled}
                         >
                             Cancel
@@ -106,7 +106,7 @@ export const PdfImportCard = ({
                         <Button
                           onClick={handleContinue}
                           size="sm"
-                          className="w-full lg:w-auto"
+                          className="w-full sm:w-auto"
                           disabled={!canImport}
                         >
                             Continue

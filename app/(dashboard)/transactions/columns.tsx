@@ -54,9 +54,11 @@ export const columns: ColumnDef<ResponseType>[] = [
     cell: ({ row }) => {
       const date = row.getValue("date") as Date;
 
+      // Short date on phones ("04 Nov") so the table fits; the full date from sm up.
       return (
-        <span>  
-          {format(date, "dd MMMM, yyyy")}
+        <span className="whitespace-nowrap">
+          <span className="sm:hidden">{format(date, "dd MMM")}</span>
+          <span className="hidden sm:inline">{format(date, "dd MMMM, yyyy")}</span>
         </span>
       )
     }
@@ -102,9 +104,15 @@ export const columns: ColumnDef<ResponseType>[] = [
 
       // Readable name in the table; hover shows the original bank text.
       return (
-        <span title={payee}>
-          {formatPayee(payee)}
-        </span>
+        <div className="min-w-0">
+          <span title={payee} className="block max-w-[7rem] min-[360px]:max-w-[8.5rem] truncate sm:max-w-none sm:whitespace-normal">
+            {formatPayee(payee)}
+          </span>
+          {/* Phones hide the date column, so the date sits under the payee. */}
+          <span className="block text-xs text-muted-foreground sm:hidden">
+            {format(new Date(row.original.date), "dd MMM yyyy")}
+          </span>
+        </div>
       )
     }
   },

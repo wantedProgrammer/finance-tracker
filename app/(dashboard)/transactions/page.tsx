@@ -153,21 +153,23 @@ if (transactionsQuery.isLoading) {
   return (
     <div className="max-w-screen-2xl mx-auto w-full pb-10 -mt-24">
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between gap-x-2">
+            {/* Phones: title on its own line, actions in an even 2x2 grid. Large screens: one row. */}
+            <CardHeader className="flex flex-col gap-y-3 lg:flex-row lg:items-center lg:justify-between lg:gap-x-2">
                 <CardTitle className="text-2xl line-clamp-1 min-w-0">
                     Transaction History
                 </CardTitle>
-                <div className="flex flex-wrap items-center justify-end gap-2">
+                <div className="grid w-full grid-cols-2 gap-2 lg:flex lg:w-auto lg:flex-wrap lg:items-center lg:justify-end">
                     <Button
                       onClick={() => categorizeTransactions.mutate()}
                       disabled={categorizeTransactions.isPending}
                       size="sm"
                       variant="outline"
+                      className="w-full lg:w-auto"
                     >
                         <Wand2 className="size-4" />
                         Categorize
                     </Button>
-                    <Button onClick={newTransaction.onOpen} size="sm">
+                    <Button onClick={newTransaction.onOpen} size="sm" className="w-full lg:w-auto">
                         <Plus className="size-4" />
                         Add New
                     </Button>
@@ -175,12 +177,15 @@ if (transactionsQuery.isLoading) {
                     <PdfUploadButton onParsed={onPdfParsed} />
                 </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6">
                 <DataTable 
                 columns={columns} 
                 data={transactions} 
                 filterKey="payee"
                 label="transaction"
+                // Phones show payee (with the date under it) and amount. Category and account are one tap
+                // away in the transaction itself, and bulk select/delete is available from sm up.
+                hiddenOnMobile={["select", "date", "category", "account"]}
                 onDelete={(row) => {
                     const ids = row.map((r) => r.original.id);
                     deleteTransactions.mutate({ ids });

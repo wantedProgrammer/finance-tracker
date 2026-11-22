@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useState } from "react";
-import{ useMedia } from "react-use";
 
 import { Menu } from "lucide-react";
 
@@ -69,22 +68,26 @@ const NavigationLinks = ({ query }: { query: string }) => {
 
     const router = useRouter();
     const pathname = usePathname();
-    const isMobile = useMedia("(max-width: 1024px)", false);
 
     const onClick = (href: string) => {
         router.push(href);
         setIsOpen(false);
     };
 
-    if(isMobile) {
-        return(
+    // Both menus are rendered and CSS picks one (menu button below lg, links from lg), so phones
+    // get the menu button immediately instead of after JavaScript measures the screen.
+    return (
+        <>
+        <div className="lg:hidden">
             <Sheet open={isOpen} onOpenChange={setIsOpen}>
                 <SheetTrigger asChild>
-                    <div
-                      className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-9 px-3 font-normal bg-white/10 hover:bg-white/20 hover:text-white border-none focus-visible:ring-offset-0 focus-visible:ring-transparent outline-none text-white focus:bg-white/30 transition"
+                    <button
+                      type="button"
+                      aria-label="Open menu"
+                      className="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50 h-9 px-3 rounded-md bg-white/10 hover:bg-white/20 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus:bg-white/30"
                     >
                         <Menu className="size-4"/>
-                    </div>
+                    </button>
                 </SheetTrigger>
                 <SheetContent side="left" className="px-2">
                     <nav className="flex flex-col gap-y-2 pt-6">
@@ -104,10 +107,7 @@ const NavigationLinks = ({ query }: { query: string }) => {
                     </nav>
                 </SheetContent>
             </Sheet>
-        );
-    }
-
-    return(
+        </div>
         <nav className="hidden lg:flex items-center gap-x-2 overflow-x-auto">
             {routes.map((route) => (
                 <NavButton
@@ -118,5 +118,6 @@ const NavigationLinks = ({ query }: { query: string }) => {
                 />
             ))}
         </nav>
+        </>
     );
 };

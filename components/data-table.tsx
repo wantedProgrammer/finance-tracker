@@ -2,6 +2,7 @@
 
 import * as React from "react"
 import { useConfirm } from "@/hooks/use-confirm"
+import { cn } from "@/lib/utils"
 
 import {
   ColumnDef,
@@ -37,6 +38,8 @@ interface DataTableProps<TData, TValue> {
   onDelete: (rows: Row<TData>[]) => void;
   disabled?: boolean;
   label?: string;
+  // Column ids to hide on phones, so the table fits without scrolling sideways.
+  hiddenOnMobile?: string[];
 }
 
 export function DataTable<TData, TValue>({
@@ -46,10 +49,15 @@ export function DataTable<TData, TValue>({
   onDelete,
   disabled,
   label = "item",
+  hiddenOnMobile = [],
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({})
+
+  // Hidden with CSS below Tailwind's "sm" breakpoint (640px), so phones get the narrow table
+  // from the first frame, without waiting for JavaScript or the layout jumping.
+  const mobileHidden = (columnId: string) => (hiddenOnMobile.includes(columnId) ? "hidden sm:table-cell" : undefined)
 
 
   const table = useReactTable({
@@ -117,7 +125,7 @@ export function DataTable<TData, TValue>({
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id}>
+                  <TableHead key={header.id} className={cn("[&_[data-slot=button]]:px-2 sm:[&_[data-slot=button]]:px-3", mobileHidden(header.column.id))}>
                     {header.isPlaceholder
                       ? null
                       : flexRender(
@@ -137,7 +145,7 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell key={cell.id} className={mobileHidden(cell.column.id)}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </TableCell>
                   ))}
@@ -154,7 +162,8 @@ export function DataTable<TData, TValue>({
         </Table>
       </div>
       <div className="flex items-center justify-end space-x-2 py-4">
-        <div className="flex-1 text-sm text-muted-foreground">
+        {/* Selection is a bulk-delete tool; on phones (where checkboxes can be hidden) it's noise. */}
+        <div className="hidden sm:block flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of {""}
           {table.getFilteredRowModel().rows.length} rows(s) selected.
 

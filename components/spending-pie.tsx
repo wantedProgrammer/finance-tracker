@@ -36,7 +36,8 @@ export const SpendingPie = ({ data = [] }: Props) => {
 
     return (
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between gap-x-4">
+            {/* Narrow on phones and in its third-width column on lg: side by side only from xl. */}
+            <CardHeader className="flex flex-col gap-y-3 sm:flex-row sm:items-center sm:justify-between sm:gap-x-4 lg:flex-col lg:items-stretch xl:flex-row xl:items-center">
                 <div className="space-y-1 min-w-0">
                     <CardTitle className="text-2xl line-clamp-1">
                         Categories
@@ -49,7 +50,7 @@ export const SpendingPie = ({ data = [] }: Props) => {
                   value={chartType}
                   onValueChange={(value) => setChartType(value as ChartType)}
                 >
-                    <SelectTrigger className="lg:w-auto h-9 rounded-md px-3">
+                    <SelectTrigger className="w-full sm:w-auto lg:w-full xl:w-auto h-9 rounded-md px-3">
                         <SelectValue placeholder="Chart type" />
                     </SelectTrigger>
                     <SelectContent>

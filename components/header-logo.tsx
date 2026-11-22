@@ -6,9 +6,9 @@ import type { JSX } from "react";
 export const HeaderLogo = (): JSX.Element => {
     return(
         <Link href="/">
-            <div className="items-center hidden lg:flex">
-                <Image src="/logo.svg" alt="Logo" width={40} height={40} className="mr-2" />
-                <p className="font-display text-white text-3xl ml-2.5 tracking-tight">
+            <div className="flex items-center">
+                <Image src="/logo.svg" alt="Horizon" width={40} height={40} className="size-9 lg:size-10 lg:mr-2" />
+                <p className="hidden lg:block font-display text-white text-3xl ml-2.5 tracking-tight">
                     Horizon
                 </p>
             </div>

@@ -34,7 +34,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    // Always use Horizon's own pages, never Clerk's hosted accounts.dev pages. These match the
+    // NEXT_PUBLIC_CLERK_* environment variables and work even if those aren't set.
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+      signInFallbackRedirectUrl="/"
+      signUpFallbackRedirectUrl="/"
+      afterSignOutUrl="/sign-in"
+    >
       <html lang="en">
         <body
           className={`${geistSans.variable} ${geistMono.variable} ${instrumentSerif.variable} antialiased`}

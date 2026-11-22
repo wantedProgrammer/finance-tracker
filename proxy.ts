@@ -9,6 +9,11 @@ export default clerkMiddleware(async (auth, req) => {
   }
 
   return NextResponse.next();
+}, {
+  // Signed-out visitors are sent to these in-app pages. Without them, Clerk falls back to its
+  // hosted Account Portal (accounts.dev) whenever NEXT_PUBLIC_CLERK_SIGN_IN_URL isn't set.
+  signInUrl: '/sign-in',
+  signUpUrl: '/sign-up',
 })
 
 export const config = {

@@ -2,12 +2,14 @@ import type { PdfLine } from "@/lib/pdf/extract-lines";
 import { formatCurrency } from "@/lib/utils";
 import type { StatementCheck, StatementParser, StatementRow, StatementTotals } from "./types";
 import { standardBankParser } from "./standard-bank";
+import { mukuruParser } from "./mukuru";
 import { genericParser } from "./generic";
 
 // Add new bank parsers here. The first parser whose detect() matches is used, so the
-// generic fallback must stay last.
+// generic fallback must stay last. Bank parsers' detect() functions must not overlap.
 export const STATEMENT_PARSERS: StatementParser[] = [
     standardBankParser,
+    mukuruParser,
     genericParser,
 ];
 
@@ -55,7 +57,9 @@ const checkStatement = (rows: StatementRow[], totals: StatementTotals, warnings:
 
     // Verified means the rows were actually compared with something on the statement:
     // nearly every row's running balance, or the statement's own totals.
-    const totalsAvailable = totals.moneyIn !== undefined || totals.moneyOut !== undefined;
+    const totalsAvailable = totals.moneyIn !== undefined
+        || totals.moneyOut !== undefined
+        || totals.closingBalance !== undefined;
     const verified = totalsAvailable || balancesChecked >= Math.max(1, rows.length - 1);
 
     if (balanceBreaks > 0) {
@@ -70,6 +74,11 @@ const checkStatement = (rows: StatementRow[], totals: StatementTotals, warnings:
     }
     if (totals.moneyOut !== undefined && cents(totals.moneyOut) !== cents(moneyOut)) {
         issues.push(`Money out is ${formatCurrency(moneyOut)}, but the statement says ${formatCurrency(totals.moneyOut)}.`);
+    }
+
+    const lastBalance = rows.at(-1)?.balance;
+    if (totals.closingBalance !== undefined && lastBalance !== undefined && cents(totals.closingBalance) !== cents(lastBalance)) {
+        issues.push(`The last balance is ${formatCurrency(lastBalance)}, but the statement ends on ${formatCurrency(totals.closingBalance)}.`);
     }
 
     return { ok: issues.length === 0, verified, issues };

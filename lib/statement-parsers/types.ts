@@ -14,6 +14,8 @@ export type StatementRow = {
 // Figures printed on the statement itself, used to check the parsed rows add up.
 export type StatementTotals = {
     openingBalance?: number;
+    // The balance printed at the end of the statement (e.g. Mukuru's "available balance").
+    closingBalance?: number;
     moneyIn?: number;
     // Negative, like the rows.
     moneyOut?: number;
